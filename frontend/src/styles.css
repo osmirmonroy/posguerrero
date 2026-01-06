@@ -1,0 +1,71 @@
+/* Global Styles */
+:root {
+    --primary-color: #D32F2F;
+    /* Red */
+    --secondary-color: #FBC02D;
+    /* Yellow */
+    --text-color: #000000;
+    /* Black */
+    --background-color: #f5f5f5;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* PrimeNG Overrides for Theme */
+.p-button {
+    background: var(--primary-color) !important;
+    border: 1px solid var(--primary-color) !important;
+}
+
+.p-button:enabled:hover {
+    background: #b71c1c !important;
+    /* Darker Red */
+    border-color: #b71c1c !important;
+}
+
+.p-button.p-button-success {
+    background: #388e3c !important;
+    /* Green for positive actions */
+    border: 1px solid #388e3c !important;
+}
+
+.p-button.p-button-warning {
+    background: var(--secondary-color) !important;
+    border: 1px solid var(--secondary-color) !important;
+    color: #000000 !important;
+}
+
+.p-menubar {
+    background: #000000 !important;
+    border: none !important;
+}
+
+.p-menubar .p-menuitem-link .p-menuitem-text,
+.p-menubar .p-menuitem-link .p-menuitem-icon {
+    color: #ffffff !important;
+}
+
+.p-menubar .p-menuitem-link:hover {
+    background: #424242 !important;
+}
+
+.card {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+    margin-bottom: 2rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--text-color);
+}

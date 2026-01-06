@@ -1,0 +1,147 @@
+<div class="grid">
+    <div class="col-12 md:col-8">
+        <div class="card">
+            <div class="flex justify-content-between mb-3">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input type="search" pInputText placeholder="Buscar por Nombre"
+                        (input)="filterProducts($any($event.target).value)">
+                </span>
+                <div class="flex gap-2">
+                    <button pButton icon="pi pi-list" class="p-button-outlined" (click)="layout = 'list'"
+                        [class.p-button-secondary]="layout !== 'list'"></button>
+                    <button pButton icon="pi pi-th-large" class="p-button-outlined" (click)="layout = 'grid'"
+                        [class.p-button-secondary]="layout !== 'grid'"></button>
+                </div>
+            </div>
+
+            <div *ngFor="let group of groupedProducts" class="mb-4">
+                <h4 class="mb-2">{{group.name}}</h4>
+                <p-dataView [value]="group.products" [layout]="layout">
+                    <ng-template let-product pTemplate="gridItem">
+                        <div class="col-12 md:col-4">
+                            <div class="product-grid-item card m-2">
+                                <div class="product-grid-item-content">
+                                    <div class="product-name font-bold text-xl mb-2">{{product.name}}</div>
+                                    <div class="product-description text-700 mb-3">{{product.description}}</div>
+                                </div>
+                                <div class="product-grid-item-bottom flex justify-content-between align-items-center">
+                                    <span class="product-price text-xl font-semibold">{{product.price |
+                                        currency}}</span>
+                                    <p-button icon="pi pi-plus" (click)="openExtrasDialog(product)"
+                                        label="Agregar"></p-button>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template let-product pTemplate="listItem">
+                        <div class="col-12">
+                            <div class="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4 card m-2">
+                                <div
+                                    class="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+                                    <div class="flex flex-column align-items-center sm:align-items-start gap-3">
+                                        <div class="text-2xl font-bold text-900">{{ product.name }}</div>
+                                        <div class="flex align-items-center gap-3">
+                                            <span class="flex align-items-center gap-2">
+                                                <i class="pi pi-tag"></i>
+                                                <span class="font-semibold">{{ product.category }}</span>
+                                            </span>
+                                        </div>
+                                        <div class="text-700">{{ product.description }}</div>
+                                    </div>
+                                    <div
+                                        class="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
+                                        <span class="text-2xl font-semibold">{{ product.price | currency }}</span>
+                                        <button pButton icon="pi pi-plus"
+                                            class="md:align-self-end mb-2 p-button-rounded"
+                                            (click)="openExtrasDialog(product)"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-dataView>
+                <p-divider></p-divider>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 md:col-4">
+        <div class="card">
+            <h5>Gestión de Pedido</h5>
+            <div class="p-fluid">
+                <div class="field">
+                    <button pButton label="Nuevo Pedido" icon="pi pi-plus" (click)="startNewOrder()"
+                        class="p-button-success mb-2"></button>
+                </div>
+            </div>
+
+            <div *ngIf="orderItems.length > 0 || currentOrder">
+                <h5>Pedido Actual <span *ngIf="currentOrder">#{{currentOrder.id}} ({{currentOrder.status}})</span></h5>
+                <p-table [value]="orderItems" [scrollable]="true" scrollHeight="300px">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cant</th>
+                            <th>Precio</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-item>
+                        <tr>
+                            <td>
+                                {{item.product.name}}
+                                <div *ngIf="item.extras && item.extras.length > 0" class="text-sm text-500">
+                                    <span *ngFor="let extra of item.extras; let last = last">
+                                        + {{extra.name}} (\${{extra.price}}){{!last ? ', ' : ''}}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>{{item.quantity}}</td>
+                            <td>
+                                {{ getItemTotal(item) | currency }}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+
+                <div class="p-fluid mt-3">
+                    <button pButton label="Enviar Pedido" icon="pi pi-check" class="mb-2" (click)="sendOrder()"
+                        [disabled]="orderItems.length === 0 || (currentOrder && currentOrder.status !== 'OPEN' && currentOrder.status !== 'REOPENED')"></button>
+
+                    <div class="grid" *ngIf="currentOrder">
+                        <div class="col-6">
+                            <button pButton label="Entregar" icon="pi pi-send" class="p-button-info"
+                                (click)="updateStatus(OrderStatus.DELIVERED)"
+                                [disabled]="currentOrder.status !== 'OPEN' && currentOrder.status !== 'REOPENED'"></button>
+                        </div>
+                        <div class="col-6">
+                            <button pButton label="Reabrir" icon="pi pi-refresh" class="p-button-warning"
+                                (click)="updateStatus(OrderStatus.REOPENED)"
+                                [disabled]="currentOrder.status !== 'DELIVERED'"></button>
+                        </div>
+                        <div class="col-12">
+                            <button pButton label="Pagar y Cerrar" icon="pi pi-dollar" class="p-button-success"
+                                (click)="updateStatus(OrderStatus.PAID)"
+                                [disabled]="currentOrder.status === 'PAID'"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog header="Seleccionar Extras" [(visible)]="extrasDialog" [modal]="true" [style]="{width: '50vw'}">
+    <div class="flex flex-column gap-2" *ngIf="extras.length > 0">
+        <div *ngFor="let extra of extras" class="field-checkbox">
+            <p-checkbox name="group" [value]="extra" [(ngModel)]="selectedExtras"
+                [inputId]="'extra' + extra.id"></p-checkbox>
+            <label [for]="'extra' + extra.id" class="ml-2">{{extra.name}} (+\${{extra.price}})</label>
+        </div>
+    </div>
+    <div *ngIf="extras.length === 0">No hay extras disponibles.</div>
+    <ng-template pTemplate="footer">
+        <p-button icon="pi pi-check" (click)="confirmExtras()" label="Confirmar" styleClass="p-button-text"></p-button>
+    </ng-template>
+</p-dialog>
+
+<p-toast></p-toast>

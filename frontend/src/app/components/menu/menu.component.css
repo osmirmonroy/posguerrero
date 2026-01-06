@@ -1,0 +1,29 @@
+.product-grid-item {
+    margin: .5em;
+    border: 1px solid #dee2e6;
+    padding: 1rem;
+}
+
+.product-grid-item-content {
+    text-align: center;
+}
+
+.product-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.product-description {
+    margin: 0.5rem 0 1rem 0;
+}
+
+.product-price {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.product-grid-item-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}

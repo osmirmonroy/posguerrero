@@ -1,0 +1,55 @@
+<div class="card">
+    <h2>Reporte de Ventas</h2>
+    <div class="p-fluid grid formgrid">
+        <div class="field col-12 md:col-3">
+            <label for="range">Rango de Fechas</label>
+            <div class="flex gap-2">
+                <p-calendar [(ngModel)]="startDate" placeholder="Inicio" dateFormat="yy-mm-dd"></p-calendar>
+                <p-calendar [(ngModel)]="endDate" placeholder="Fin" dateFormat="yy-mm-dd"></p-calendar>
+            </div>
+        </div>
+        <div class="field col-12 md:col-3">
+            <label for="categories">Categorías</label>
+            <p-multiSelect [options]="categories" [(ngModel)]="selectedCategories" defaultLabel="Todas las Categorías"
+                selectedItemsLabel="{0} items selected"></p-multiSelect>
+        </div>
+        <div class="field col-12 md:col-3">
+            <label for="products">Productos</label>
+            <p-multiSelect [options]="products" [(ngModel)]="selectedProducts" defaultLabel="Todos los Productos"
+                selectedItemsLabel="{0} items selected"></p-multiSelect>
+        </div>
+        <div class="field col-12 md:col-3 flex align-items-end gap-2">
+            <button pButton label="Generar" icon="pi pi-search" (click)="generateReport()"></button>
+            <button pButton label="Limpiar" icon="pi pi-filter-slash" class="p-button-secondary"
+                (click)="clearFilters()"></button>
+        </div>
+    </div>
+
+    <div class="card mb-4" *ngIf="chartData">
+        <p-chart type="bar" [data]="chartData" [options]="chartOptions"></p-chart>
+    </div>
+
+    <p-table [value]="reportData" [paginator]="true" [rows]="10" [rowHover]="true" styleClass="p-datatable-gridlines">
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="date">Fecha <p-sortIcon field="date"></p-sortIcon></th>
+                <th pSortableColumn="category">Categoría <p-sortIcon field="category"></p-sortIcon></th>
+                <th pSortableColumn="quantity">Cantidad <p-sortIcon field="quantity"></p-sortIcon></th>
+                <th pSortableColumn="totalSales">Total Ventas <p-sortIcon field="totalSales"></p-sortIcon></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-report>
+            <tr>
+                <td>{{report.date}}</td>
+                <td>{{report.category}}</td>
+                <td>{{report.quantity}}</td>
+                <td>{{report.totalSales | currency}}</td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="4" class="text-center">No se encontraron registros.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

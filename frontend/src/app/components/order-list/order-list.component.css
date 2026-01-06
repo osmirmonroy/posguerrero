@@ -1,0 +1,28 @@
+.order-badge {
+    border-radius: 2px;
+    padding: .25em .5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .3px;
+}
+
+.status-open {
+    background-color: #C8E6C9;
+    color: #256029;
+}
+
+.status-delivered {
+    background-color: #B3E5FC;
+    color: #01579B;
+}
+
+.status-reopened {
+    background-color: #FFCCBC;
+    color: #BF360C;
+}
+
+.status-paid {
+    background-color: #ECCFFF;
+    color: #694382;
+}

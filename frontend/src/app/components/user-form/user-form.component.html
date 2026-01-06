@@ -1,0 +1,30 @@
+<div class="user-form-container fade-in flex justify-content-center">
+    <p-card [header]="isEditMode ? 'Editar Usuario' : 'Nuevo Usuario'" [style]="{width: '450px'}" styleClass="shadow-4">
+        <form (ngSubmit)="onSubmit()" #userForm="ngForm">
+            <div class="field mb-4">
+                <label for="username" class="block font-medium mb-2">Nombre de Usuario</label>
+                <input type="text" pInputText id="username" [(ngModel)]="user.username" name="username" required
+                    class="w-full">
+            </div>
+
+            <div class="field mb-4">
+                <label for="password" class="block font-medium mb-2">Contraseña <span *ngIf="isEditMode"
+                        class="text-500 font-normal text-sm">(Dejar en blanco para mantener actual)</span></label>
+                <input type="password" pInputText id="password" [(ngModel)]="user.password" name="password"
+                    [required]="!isEditMode" class="w-full">
+            </div>
+
+            <div class="field mb-5">
+                <label for="role" class="block font-medium mb-2">Rol</label>
+                <p-dropdown [options]="roles" [(ngModel)]="user.role" name="role" optionLabel="label"
+                    optionValue="value" styleClass="w-full"></p-dropdown>
+            </div>
+
+            <div class="flex justify-content-end gap-2">
+                <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-secondary p-button-text"
+                    routerLink="/users"></p-button>
+                <p-button label="Guardar" icon="pi pi-check" type="submit" [disabled]="!userForm.form.valid"></p-button>
+            </div>
+        </form>
+    </p-card>
+</div>
