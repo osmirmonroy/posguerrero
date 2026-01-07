@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product, Order, Extra, SalesReportDTO } from '../models/taqueria.models';
+import { environment } from '../../environments/environment';
+
 
 export interface User {
     id?: number;
@@ -15,7 +17,7 @@ export interface User {
     providedIn: 'root'
 })
 export class TaqueriaService {
-    private apiUrl = 'http://localhost:8080/api';
+    private apiUrl = environment.apiUrl;
 
     constructor(private http: HttpClient) { }
 
