@@ -1,6 +1,7 @@
 /* Global Styles */
 :root {
-    --primary-color: #D32F2F;
+    /**  --primary-color: #D32F2F;*/
+    --primary-color: #blue;
     /* Red */
     --secondary-color: #FBC02D;
     /* Yellow */
