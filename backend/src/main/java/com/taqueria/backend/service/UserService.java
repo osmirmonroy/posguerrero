@@ -1,8 +1,8 @@
-package com.taqueria.backend.services;
+package com.taqueria.backend.service;
 
 import com.taqueria.backend.dto.UserDto;
-import com.taqueria.backend.models.User;
-import com.taqueria.backend.repositories.UserRepository;
+import com.taqueria.backend.model.User;
+import com.taqueria.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

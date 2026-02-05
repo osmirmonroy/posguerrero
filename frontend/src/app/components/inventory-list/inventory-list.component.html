@@ -1,0 +1,119 @@
+<div class="card">
+    <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="New Supply" icon="pi pi-plus" class="p-button-success mr-2"
+                (click)="openNew()"></button>
+            <button pButton pRipple label="Manage Suppliers" icon="pi pi-users" class="p-button-help"
+                [routerLink]="['/admin/suppliers']"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="supplies" [rows]="10" [paginator]="true" [globalFilterFields]="['name','category']"
+        [rowHover]="true" dataKey="id" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="flex align-items-center justify-content-between">
+                <h5 class="m-0">Manage Inventory</h5>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+                <th>Unit</th>
+                <th pSortableColumn="stock">Stock <p-sortIcon field="stock"></p-sortIcon></th>
+                <th>Min. Stock</th>
+                <th>Supplier</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-supply>
+            <tr [ngClass]="{'bg-red-100': supply.stock <= supply.minStock}">
+                <td>{{supply.name}}</td>
+                <td>{{supply.unit}}</td>
+                <td>
+                    <span
+                        [class]="'product-badge status-' + (supply.stock <= supply.minStock ? 'lowstock' : 'instock')">
+                        {{supply.stock}}
+                    </span>
+                </td>
+                <td>{{supply.minStock}}</td>
+                <td>{{supply.supplier?.name || '-'}}</td>
+                <td>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                        (click)="editSupply(supply)"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2"
+                        (click)="deleteSupply(supply)"></button>
+                    <button pButton pRipple icon="pi pi-plus" class="p-button-rounded p-button-info mr-2"
+                        (click)="openTransactionDialog(supply, 'IN')" pTooltip="Add Stock"></button>
+                    <button pButton pRipple icon="pi pi-minus" class="p-button-rounded p-button-danger mr-2"
+                        (click)="openTransactionDialog(supply, 'OUT')" pTooltip="Remove Stock"></button>
+                    <button pButton pRipple icon="pi pi-list" class="p-button-rounded p-button-secondary"
+                        (click)="openKardex(supply)" pTooltip="Kardex"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- Supply Dialog -->
+<p-dialog [(visible)]="supplyDialog" [style]="{width: '450px'}" header="Product Details" [modal]="true"
+    styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="field">
+            <label for="name">Name</label>
+            <input type="text" pInputText id="name" [(ngModel)]="supply.name" required autofocus />
+            <small class="p-error" *ngIf="submitted && !supply.name">Name is required.</small>
+        </div>
+        <div class="field">
+            <label for="unit">Unit</label>
+            <input type="text" pInputText id="unit" [(ngModel)]="supply.unit" />
+        </div>
+        <div class="formgrid grid">
+            <div class="field col">
+                <label for="minStock">Min Stock</label>
+                <p-inputNumber id="minStock" [(ngModel)]="supply.minStock"></p-inputNumber>
+            </div>
+            <div class="field col">
+                <label for="cost">Cost</label>
+                <p-inputNumber id="cost" [(ngModel)]="supply.cost" mode="currency" currency="USD"
+                    locale="en-US"></p-inputNumber>
+            </div>
+        </div>
+        <div class="field">
+            <label for="supplier">Supplier</label>
+            <p-dropdown [options]="suppliers" [(ngModel)]="supply.supplier" optionLabel="name"
+                placeholder="Select a Supplier" [showClear]="true"></p-dropdown>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveSupply()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- Transaction Dialog -->
+<p-dialog [(visible)]="transactionDialog" [style]="{width: '450px'}" [header]="'Stock ' + transaction.type"
+    [modal]="true" styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="field">
+            <label>Quantity</label>
+            <p-inputNumber [(ngModel)]="transaction.quantity" [min]="0"></p-inputNumber>
+        </div>
+        <div class="field">
+            <label>Reason</label>
+            <input type="text" pInputText [(ngModel)]="transaction.reason" />
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" class="p-button-text" (click)="transactionDialog = false"></button>
+        <button pButton pRipple label="Confirm" class="p-button-text" (click)="saveTransaction()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- Kardex Dialog -->
+<p-dialog [(visible)]="kardexDialog" [style]="{width: '800px'}" header="Kardex (History)" [modal]="true">
+    <app-kardex-view *ngIf="selectedSupplyForKardex" [supplyId]="selectedSupplyForKardex.id"></app-kardex-view>
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>

@@ -46,6 +46,11 @@ export class AppComponent implements OnInit {
     if (user.role === 'ADMIN') {
       this.items.push(
         {
+          label: 'Dashboard',
+          icon: 'pi pi-fw pi-home',
+          routerLink: '/admin/dashboard'
+        },
+        {
           label: 'Admin Productos',
           icon: 'pi pi-fw pi-cog',
           routerLink: '/admin/products'
@@ -54,6 +59,14 @@ export class AppComponent implements OnInit {
           label: 'Admin Extras',
           icon: 'pi pi-fw pi-plus-circle',
           routerLink: '/admin/extras'
+        },
+        {
+          label: 'Inventario',
+          icon: 'pi pi-fw pi-box',
+          items: [
+            { label: 'Insumos & Stock', icon: 'pi pi-fw pi-list', routerLink: '/inventory/supplies' },
+            { label: 'Proveedores', icon: 'pi pi-fw pi-users', routerLink: '/admin/suppliers' }
+          ]
         },
         {
           label: 'Reporte Ventas',
@@ -67,6 +80,20 @@ export class AppComponent implements OnInit {
         }
       );
     }
+
+    if (user.role === 'COCINERO' || user.role === 'ADMIN') {
+      this.items.push({
+        label: 'Cocina',
+        icon: 'pi pi-fw pi-inbox',
+        routerLink: '/kitchen'
+      });
+    }
+
+    this.items.push({
+      label: 'Turnos',
+      icon: 'pi pi-fw pi-clock',
+      routerLink: '/shifts'
+    });
 
     this.items.push({
       label: 'Logout',

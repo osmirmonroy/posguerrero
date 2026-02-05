@@ -1,8 +1,8 @@
 package com.taqueria.backend.config;
 
-import com.taqueria.backend.models.Role;
-import com.taqueria.backend.models.User;
-import com.taqueria.backend.repositories.UserRepository;
+import com.taqueria.backend.model.Role;
+import com.taqueria.backend.model.User;
+import com.taqueria.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

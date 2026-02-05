@@ -1,0 +1,76 @@
+<div class="grid p-3">
+    <!-- Column: Pendientes -->
+    <div class="col-12 md:col-4">
+        <div class="surface-card p-3 shadow-2 border-round">
+            <div class="text-xl font-bold mb-3 text-orange-500">Pendientes ({{openOrders.length}})</div>
+            <div *ngFor="let order of openOrders" class="mb-3">
+                <p-card [header]="'Orden #' + order.id + ' (Mesa ' + (order.tableNumber || 'N/A') + ')'"
+                    [style]="{'background-color': '#fff3e0'}">
+                    <div class="text-500 mb-2">{{ getElapsedTime(order.date) }}</div>
+                    <ul>
+                        <li *ngFor="let item of order.items">
+                            <span class="font-bold">{{item.quantity}}x</span> {{item.product.name}}
+                            <div *ngIf="item.extras && item.extras.length > 0" class="text-sm text-600 pl-3">
+                                <div *ngFor="let extra of item.extras">+ {{extra.name}}</div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ng-template pTemplate="footer">
+                        <button pButton label="Preparar" icon="pi pi-cog" class="p-button-warning"
+                            (click)="updateStatus(order, 'PREPARING')"></button>
+                    </ng-template>
+                </p-card>
+            </div>
+        </div>
+    </div>
+
+    <!-- Column: Preparando -->
+    <div class="col-12 md:col-4">
+        <div class="surface-card p-3 shadow-2 border-round">
+            <div class="text-xl font-bold mb-3 text-blue-500">Preparando ({{preparingOrders.length}})</div>
+            <div *ngFor="let order of preparingOrders" class="mb-3">
+                <p-card [header]="'Orden #' + order.id + ' (Mesa ' + (order.tableNumber || 'N/A') + ')'"
+                    [style]="{'background-color': '#e3f2fd'}">
+                    <div class="text-500 mb-2">{{ getElapsedTime(order.date) }}</div>
+                    <ul>
+                        <li *ngFor="let item of order.items">
+                            <span class="font-bold">{{item.quantity}}x</span> {{item.product.name}}
+                            <div *ngIf="item.extras && item.extras.length > 0" class="text-sm text-600 pl-3">
+                                <div *ngFor="let extra of item.extras">+ {{extra.name}}</div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ng-template pTemplate="footer">
+                        <button pButton label="Listo" icon="pi pi-check" class="p-button-success"
+                            (click)="updateStatus(order, 'READY')"></button>
+                    </ng-template>
+                </p-card>
+            </div>
+        </div>
+    </div>
+
+    <!-- Column: Listos -->
+    <div class="col-12 md:col-4">
+        <div class="surface-card p-3 shadow-2 border-round">
+            <div class="text-xl font-bold mb-3 text-green-500">Listos ({{readyOrders.length}})</div>
+            <div *ngFor="let order of readyOrders" class="mb-3">
+                <p-card [header]="'Orden #' + order.id + ' (Mesa ' + (order.tableNumber || 'N/A') + ')'"
+                    [style]="{'background-color': '#e8f5e9'}">
+                    <div class="text-500 mb-2">{{ getElapsedTime(order.date) }}</div>
+                    <ul>
+                        <li *ngFor="let item of order.items">
+                            <span class="font-bold">{{item.quantity}}x</span> {{item.product.name}}
+                            <div *ngIf="item.extras && item.extras.length > 0" class="text-sm text-600 pl-3">
+                                <div *ngFor="let extra of item.extras">+ {{extra.name}}</div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ng-template pTemplate="footer">
+                        <button pButton label="Entregado" icon="pi pi-send" class="p-button-secondary"
+                            (click)="updateStatus(order, 'DELIVERED')"></button>
+                    </ng-template>
+                </p-card>
+            </div>
+        </div>
+    </div>
+</div>

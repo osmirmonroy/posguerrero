@@ -1,4 +1,4 @@
-package com.taqueria.backend.models;
+package com.taqueria.backend.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,6 +27,7 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String username;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)

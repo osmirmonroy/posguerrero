@@ -1,0 +1,50 @@
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Control de Turno (Caja)</h3>
+        </div>
+        <div class="card-body">
+            <div *ngIf="loading" class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <div *ngIf="!loading && error" class="alert alert-danger">
+                {{ error }}
+            </div>
+
+            <!-- Open Shift View -->
+            <div *ngIf="!loading && !currentShift">
+                <h4 class="card-title">Apertura de Turno</h4>
+                <div class="mb-3">
+                    <label for="initialCash" class="form-label">Efectivo Inicial en Caja</label>
+                    <input type="number" class="form-control" id="initialCash" [(ngModel)]="initialCash">
+                </div>
+                <button class="btn btn-success" (click)="onOpenShift()">Abrir Turno</button>
+            </div>
+
+            <!-- Close Shift View -->
+            <div *ngIf="!loading && currentShift">
+                <h4 class="card-title">Turno Activo</h4>
+                <div class="alert alert-info">
+                    <strong>Inicio:</strong> {{ currentShift.startTime | date:'medium' }} <br>
+                    <strong>Fondo Inicial:</strong> {{ currentShift.initialCash | currency }}
+                </div>
+
+                <hr>
+
+                <h5>Cierre de Turno</h5>
+                <div class="mb-3">
+                    <label for="finalCash" class="form-label">Efectivo Declarado (Conteo físico)</label>
+                    <input type="number" class="form-control" id="finalCash" [(ngModel)]="finalCashDeclared">
+                </div>
+                <div class="mb-3">
+                    <label for="comments" class="form-label">Comentarios / Observaciones</label>
+                    <textarea class="form-control" id="comments" rows="3" [(ngModel)]="comments"></textarea>
+                </div>
+                <button class="btn btn-danger" (click)="onCloseShift()">Cerrar Turno (Corte)</button>
+            </div>
+        </div>
+    </div>
+</div>

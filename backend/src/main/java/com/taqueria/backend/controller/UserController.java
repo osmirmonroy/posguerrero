@@ -1,7 +1,7 @@
-package com.taqueria.backend.controllers;
+package com.taqueria.backend.controller;
 
 import com.taqueria.backend.dto.UserDto;
-import com.taqueria.backend.services.UserService;
+import com.taqueria.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

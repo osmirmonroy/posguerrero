@@ -1,0 +1,70 @@
+<div class="card">
+    <p-toolbar styleClass="mb-4">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="New Supplier" icon="pi pi-plus" class="p-button-success mr-2"
+                (click)="openNew()"></button>
+            <button pButton pRipple label="Back to Inventory" icon="pi pi-arrow-left" class="p-button-secondary"
+                [routerLink]="['/admin/inventory']"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table [value]="suppliers" [rows]="10" [paginator]="true" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-s>
+            <tr>
+                <td>{{s.name}}</td>
+                <td>{{s.contactName}}</td>
+                <td>{{s.phoneNumber}}</td>
+                <td>{{s.email}}</td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                        (click)="editSupplier(s)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                        (click)="deleteSupplier(s)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [(visible)]="supplierDialog" [style]="{width: '450px'}" header="Supplier Details" [modal]="true"
+    styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="field">
+            <label for="name">Company Name</label>
+            <input type="text" pInputText id="name" [(ngModel)]="supplier.name" required autofocus />
+            <small class="p-error" *ngIf="submitted && !supplier.name">Name is required.</small>
+        </div>
+        <div class="field">
+            <label for="contact">Contact Name</label>
+            <input type="text" pInputText id="contact" [(ngModel)]="supplier.contactName" />
+        </div>
+        <div class="field">
+            <label for="phone">Phone</label>
+            <input type="text" pInputText id="phone" [(ngModel)]="supplier.phoneNumber" />
+        </div>
+        <div class="field">
+            <label for="email">Email</label>
+            <input type="text" pInputText id="email" [(ngModel)]="supplier.email" />
+        </div>
+        <div class="field">
+            <label for="address">Address</label>
+            <input type="text" pInputText id="address" [(ngModel)]="supplier.address" />
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveSupplier()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>

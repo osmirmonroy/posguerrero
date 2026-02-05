@@ -40,6 +40,9 @@ public class SecurityConfig {
                                                 .hasAuthority("ADMIN")
                                                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**")
                                                 .permitAll()
+                                                .requestMatchers(new AntPathRequestMatcher("/ws/**")).permitAll()
+                                                // .requestMatchers(new AntPathRequestMatcher("/error")).permitAll()
+                                                // .requestMatchers(new AntPathRequestMatcher("/")).permitAll()
                                                 .anyRequest().authenticated())
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

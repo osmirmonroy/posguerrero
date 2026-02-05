@@ -1,6 +1,6 @@
 package com.taqueria.backend.config;
 
-import com.taqueria.backend.repositories.UserRepository;
+import com.taqueria.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

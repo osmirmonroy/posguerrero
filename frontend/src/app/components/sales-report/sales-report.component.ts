@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TaqueriaService } from '../../services/taqueria.service';
-import { SalesReportDTO, Product } from '../../models/taqueria.models';
+import { SalesReportDTO, Product, TopProduct, PaymentMethodStats } from '../../models/taqueria.models';
 
 @Component({
     selector: 'app-sales-report',
@@ -9,11 +9,17 @@ import { SalesReportDTO, Product } from '../../models/taqueria.models';
 })
 export class SalesReportComponent implements OnInit {
     reportData: SalesReportDTO[] = [];
+    topProducts: TopProduct[] = [];
+    paymentStats: PaymentMethodStats[] = [];
+
     startDate: Date | undefined;
     endDate: Date | undefined;
     selectedCategories: string[] = [];
     selectedProducts: string[] = [];
+
     chartData: any;
+    topProductsChart: any;
+    paymentChart: any;
     chartOptions: any;
 
     categories: any[] = [
@@ -38,27 +44,17 @@ export class SalesReportComponent implements OnInit {
         this.chartOptions = {
             plugins: {
                 legend: {
-                    labels: {
-                        color: '#495057'
-                    }
+                    labels: { color: '#495057' }
                 }
             },
             scales: {
                 x: {
-                    ticks: {
-                        color: '#495057'
-                    },
-                    grid: {
-                        color: '#ebedef'
-                    }
+                    ticks: { color: '#495057' },
+                    grid: { color: '#ebedef' }
                 },
                 y: {
-                    ticks: {
-                        color: '#495057'
-                    },
-                    grid: {
-                        color: '#ebedef'
-                    }
+                    ticks: { color: '#495057' },
+                    grid: { color: '#ebedef' }
                 }
             }
         };
@@ -74,38 +70,63 @@ export class SalesReportComponent implements OnInit {
         const start = this.startDate ? this.startDate.toISOString().split('T')[0] : undefined;
         const end = this.endDate ? this.endDate.toISOString().split('T')[0] : undefined;
 
+        // General Sales
         this.taqueriaService.getSalesReport(start, end, this.selectedCategories, this.selectedProducts)
             .subscribe(data => {
                 this.reportData = data;
-                this.updateChart();
+                this.updateSalesChart();
             });
-    }
 
-    updateChart() {
-        const salesByDate: { [key: string]: number } = {};
-
-        this.reportData.forEach(item => {
-            if (salesByDate[item.date]) {
-                salesByDate[item.date] += item.totalSales;
-            } else {
-                salesByDate[item.date] = item.totalSales;
-            }
+        // Top Products
+        this.taqueriaService.getTopProducts(start, end).subscribe(data => {
+            this.topProducts = data;
+            this.updateTopProductsChart();
         });
 
+        // Payment Stats
+        this.taqueriaService.getPaymentStats(start, end).subscribe(data => {
+            this.paymentStats = data;
+            this.updatePaymentChart();
+        });
+    }
+
+    updateSalesChart() {
+        const salesByDate: { [key: string]: number } = {};
+        this.reportData.forEach(item => {
+            salesByDate[item.date] = (salesByDate[item.date] || 0) + item.totalSales;
+        });
         const dates = Object.keys(salesByDate).sort();
         const sales = dates.map(date => salesByDate[date]);
-
         this.chartData = {
             labels: dates,
-            datasets: [
-                {
-                    label: 'Ventas Totales por Día',
-                    data: sales,
-                    backgroundColor: '#FFA726',
-                    borderColor: '#FB8C00',
-                    borderWidth: 1
-                }
-            ]
+            datasets: [{
+                label: 'Total Sales by Day',
+                data: sales,
+                backgroundColor: '#FFA726',
+                borderColor: '#FB8C00',
+                borderWidth: 1
+            }]
+        };
+    }
+
+    updateTopProductsChart() {
+        this.topProductsChart = {
+            labels: this.topProducts.slice(0, 5).map(p => p.productName),
+            datasets: [{
+                label: 'Top 5 Products (Quantity)',
+                data: this.topProducts.slice(0, 5).map(p => p.quantity),
+                backgroundColor: ['#42A5F5', '#66BB6A', '#FFA726', '#26C6DA', '#7E57C2']
+            }]
+        };
+    }
+
+    updatePaymentChart() {
+        this.paymentChart = {
+            labels: this.paymentStats.map(p => p.paymentMethod),
+            datasets: [{
+                data: this.paymentStats.map(p => p.total),
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+            }]
         };
     }
 
@@ -115,5 +136,29 @@ export class SalesReportComponent implements OnInit {
         this.selectedCategories = [];
         this.selectedProducts = [];
         this.generateReport();
+    }
+
+    exportPdf() {
+        const start = this.startDate ? this.startDate.toISOString().split('T')[0] : undefined;
+        const end = this.endDate ? this.endDate.toISOString().split('T')[0] : undefined;
+        this.taqueriaService.exportPdf(start, end).subscribe(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sales_report.pdf';
+            a.click();
+        });
+    }
+
+    exportExcel() {
+        const start = this.startDate ? this.startDate.toISOString().split('T')[0] : undefined;
+        const end = this.endDate ? this.endDate.toISOString().split('T')[0] : undefined;
+        this.taqueriaService.exportExcel(start, end).subscribe(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sales_report.xlsx';
+            a.click();
+        });
     }
 }

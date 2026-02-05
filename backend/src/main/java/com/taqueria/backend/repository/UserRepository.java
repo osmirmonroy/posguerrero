@@ -1,6 +1,6 @@
-package com.taqueria.backend.repositories;
+package com.taqueria.backend.repository;
 
-import com.taqueria.backend.models.User;
+import com.taqueria.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

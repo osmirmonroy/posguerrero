@@ -16,13 +16,20 @@ public class TaqueriaController {
     @Autowired
     private TaqueriaService taqueriaService;
 
+    @Autowired
+    private com.taqueria.backend.repository.UserRepository userRepository;
+
     @GetMapping("/products")
     public List<Product> getAllProducts() {
         return taqueriaService.getAllProducts();
     }
 
     @PostMapping("/orders")
-    public Order createOrder(@RequestBody Order order) {
+    public Order createOrder(@RequestBody Order order, java.security.Principal principal) {
+        if (principal != null) {
+            com.taqueria.backend.model.User user = userRepository.findByUsername(principal.getName()).orElse(null);
+            order.setUser(user);
+        }
         return taqueriaService.createOrder(order);
     }
 
@@ -76,5 +83,17 @@ public class TaqueriaController {
     @DeleteMapping("/extras/{id}")
     public void deleteExtra(@PathVariable Long id) {
         taqueriaService.deleteExtra(id);
+    }
+
+    @GetMapping("/kitchen/orders")
+    public List<Order> getKitchenOrders() {
+        return taqueriaService.getKitchenOrders();
+    }
+
+    @PatchMapping("/orders/{id}/status")
+    public Order updateOrderStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> statusMap) {
+        String statusStr = statusMap.get("status");
+        com.taqueria.backend.model.OrderStatus status = com.taqueria.backend.model.OrderStatus.valueOf(statusStr);
+        return taqueriaService.updateOrderStatus(id, status);
     }
 }

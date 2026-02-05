@@ -10,6 +10,11 @@ import { SalesReportComponent } from './components/sales-report/sales-report.com
 import { LoginComponent } from './components/login/login.component';
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
+import { KitchenDashboardComponent } from './components/kitchen-dashboard/kitchen-dashboard.component';
+import { ShiftControlComponent } from './components/shift-control/shift-control.component';
+import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
+import { InventoryListComponent } from './components/inventory-list/inventory-list.component';
+import { SupplierCrudComponent } from './components/supplier-crud/supplier-crud.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -21,7 +26,13 @@ const routes: Routes = [
   { path: 'admin/reports/sales', component: SalesReportComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
   { path: 'users', component: UserListComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
   { path: 'users/new', component: UserFormComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
-  { path: 'users/edit/:id', component: UserFormComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } }
+  { path: 'users/new', component: UserFormComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
+  { path: 'users/edit/:id', component: UserFormComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
+  { path: 'inventory/supplies', component: InventoryListComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
+  { path: 'admin/suppliers', component: SupplierCrudComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
+  { path: 'kitchen', component: KitchenDashboardComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'COCINERO' } },
+  { path: 'shifts', component: ShiftControlComponent, canActivate: [AuthGuard] },
+  { path: 'admin/dashboard', component: AdminDashboardComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } }
 ];
 
 @NgModule({

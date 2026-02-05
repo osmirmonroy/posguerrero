@@ -31,9 +31,16 @@ import { SalesReportComponent } from './components/sales-report/sales-report.com
 import { CalendarModule } from 'primeng/calendar';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ChartModule } from 'primeng/chart';
+import { TabViewModule } from 'primeng/tabview';
 import { LoginComponent } from './components/login/login.component';
 import { UserListComponent } from './components/user-list/user-list.component';
 import { UserFormComponent } from './components/user-form/user-form.component';
+import { KitchenDashboardComponent } from './components/kitchen-dashboard/kitchen-dashboard.component';
+import { ShiftControlComponent } from './components/shift-control/shift-control.component';
+import { InventoryListComponent } from './components/inventory-list/inventory-list.component';
+import { SupplierCrudComponent } from './components/supplier-crud/supplier-crud.component';
+import { KardexViewComponent } from './components/kardex-view/kardex-view.component';
+import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +52,14 @@ import { UserFormComponent } from './components/user-form/user-form.component';
     SalesReportComponent,
     LoginComponent,
     UserListComponent,
-    UserFormComponent
+    UserFormComponent,
+    KitchenDashboardComponent,
+    ShiftControlComponent,
+    InventoryListComponent,
+    SupplierCrudComponent,
+    SupplierCrudComponent,
+    KardexViewComponent,
+    AdminDashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -70,7 +84,9 @@ import { UserFormComponent } from './components/user-form/user-form.component';
     DropdownModule,
     CalendarModule,
     MultiSelectModule,
-    ChartModule
+    MultiSelectModule,
+    ChartModule,
+    TabViewModule
   ],
   providers: [
     MessageService,

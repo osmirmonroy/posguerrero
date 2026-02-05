@@ -1,6 +1,6 @@
 package com.taqueria.backend.dto;
 
-import com.taqueria.backend.models.Role;
+import com.taqueria.backend.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

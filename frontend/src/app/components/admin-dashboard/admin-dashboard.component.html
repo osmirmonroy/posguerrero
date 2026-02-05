@@ -1,0 +1,71 @@
+<div class="card fade-in">
+    <div class="flex justify-content-between align-items-center mb-4">
+        <h2>Dashboard Administrativo - Hoy</h2>
+        <button pButton label="Actualizar" icon="pi pi-refresh" (click)="loadDashboardData()"></button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid mb-4">
+        <div class="col-12 md:col-4">
+            <div class="surface-card shadow-2 p-3 border-round">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Ventas Totales</span>
+                        <div class="text-900 font-medium text-xl">{{ summary?.dailySalesTotal | currency }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                        style="width:2.5rem;height:2.5rem">
+                        <i class="pi pi-dollar text-blue-500 text-xl"></i>
+                    </div>
+                </div>
+                <span class="text-green-500 font-medium">Hoy </span>
+            </div>
+        </div>
+        <div class="col-12 md:col-4">
+            <div class="surface-card shadow-2 p-3 border-round">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Ordenes Activas</span>
+                        <div class="text-900 font-medium text-xl">{{ summary?.activeOrdersCount }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-orange-100 border-round"
+                        style="width:2.5rem;height:2.5rem">
+                        <i class="pi pi-shopping-bag text-orange-500 text-xl"></i>
+                    </div>
+                </div>
+                <span class="text-500">En proceso</span>
+            </div>
+        </div>
+        <div class="col-12 md:col-4">
+            <div class="surface-card shadow-2 p-3 border-round">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Stock Bajo</span>
+                        <div class="text-900 font-medium text-xl">{{ summary?.lowStockItemsCount }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-red-100 border-round"
+                        style="width:2.5rem;height:2.5rem">
+                        <i class="pi pi-exclamation-triangle text-red-500 text-xl"></i>
+                    </div>
+                </div>
+                <span class="text-red-500 font-medium">Items Críticos</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid">
+        <div class="col-12 md:col-6">
+            <div class="card">
+                <h5>Top Productos (Hoy)</h5>
+                <p-chart type="bar" [data]="productsChart" [options]="chartOptions" *ngIf="productsChart"></p-chart>
+            </div>
+        </div>
+        <div class="col-12 md:col-6">
+            <div class="card">
+                <h5>Métodos de Pago (Hoy)</h5>
+                <p-chart type="pie" [data]="paymentChart" *ngIf="paymentChart"></p-chart>
+            </div>
+        </div>
+    </div>
+</div>

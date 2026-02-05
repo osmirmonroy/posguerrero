@@ -11,10 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class TaqueriaService {
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private ProductRepository productRepository;
@@ -96,7 +101,9 @@ public class TaqueriaService {
                 }
                 order.setTotal(total);
             }
-            return orderRepository.save(order);
+            Order savedOrder = orderRepository.save(order);
+            messagingTemplate.convertAndSend("/topic/orders", savedOrder);
+            return savedOrder;
         }
         return null;
     }
@@ -130,5 +137,22 @@ public class TaqueriaService {
 
     public void deleteExtra(Long id) {
         extraRepository.deleteById(id);
+    }
+
+    public List<Order> getKitchenOrders() {
+        return orderRepository
+                .findByStatusIn(Arrays.asList(OrderStatus.OPEN, OrderStatus.PREPARING, OrderStatus.READY));
+    }
+
+    public Order updateOrderStatus(Long id, OrderStatus status) {
+        Order order = orderRepository.findById(id).orElse(null);
+        if (order != null) {
+            order.setStatus(status);
+            Order updatedOrder = orderRepository.save(order);
+            // Notify kitchen/cashier
+            messagingTemplate.convertAndSend("/topic/orders", updatedOrder);
+            return updatedOrder;
+        }
+        return null;
     }
 }

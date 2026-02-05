@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 
@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root'
 })
 export class AuthService {
-    private apiUrl = environment.apiUrl + '/auth';
+    private apiUrl = environment.apiUrl.replace('/api', '') + '/auth';
     private currentUserSubject: BehaviorSubject<any>;
     public currentUser: Observable<any>;
 
@@ -45,5 +45,20 @@ export class AuthService {
     hasRole(role: string): boolean {
         const user = this.currentUserValue;
         return user && user.role === role;
+    }
+
+    refreshToken(): Observable<any> {
+        const user = this.currentUserValue;
+        const refreshToken = user?.refreshToken;
+        if (!refreshToken) {
+            return throwError(() => new Error('No refresh token'));
+        }
+        return this.http.post<any>(`${this.apiUrl}/refresh`, { refreshToken })
+            .pipe(tap(response => {
+                // Update current user with new token
+                const currentUser = { ...this.currentUserValue, token: response.accessToken, refreshToken: response.refreshToken };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                this.currentUserSubject.next(currentUser);
+            }));
     }
 }

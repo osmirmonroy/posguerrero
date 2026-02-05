@@ -31,7 +31,11 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value)
       .subscribe({
         next: () => {
-          this.router.navigate(['/']);
+          if (this.authService.hasRole('COCINERO')) {
+            this.router.navigate(['/kitchen']);
+          } else {
+            this.router.navigate(['/']);
+          }
         },
         error: error => {
           this.error = 'Invalid credentials';
