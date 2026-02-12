@@ -15,4 +15,6 @@ public class UserDto {
     private String username;
     private String password; // Only for creation/update
     private Role role;
+    private Long branchId;
+    private String branchName;
 }

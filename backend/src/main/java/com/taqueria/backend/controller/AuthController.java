@@ -49,6 +49,8 @@ public class AuthController {
                                 .token(jwtToken)
                                 .refreshToken(refreshToken.getToken())
                                 .role(user.getRole())
+                                .username(user.getUsername())
+                                .branchName(user.getBranch() != null ? user.getBranch().getName() : null)
                                 .build());
         }
 

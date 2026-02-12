@@ -1,13 +1,17 @@
 package com.taqueria.backend.controller;
 
+import java.util.List;
+import java.util.Map;
 import com.taqueria.backend.model.Extra;
 import com.taqueria.backend.model.Order;
 import com.taqueria.backend.model.Product;
+import com.taqueria.backend.model.OrderStatus;
+import com.taqueria.backend.model.Category;
+import com.taqueria.backend.model.OrderItem;
 import com.taqueria.backend.service.TaqueriaService;
+import com.taqueria.backend.dto.ProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -20,8 +24,15 @@ public class TaqueriaController {
     private com.taqueria.backend.repository.UserRepository userRepository;
 
     @GetMapping("/products")
-    public List<Product> getAllProducts() {
-        return taqueriaService.getAllProducts();
+    public List<Product> getAllProducts(java.security.Principal principal) {
+        Long branchId = null;
+        if (principal != null) {
+            com.taqueria.backend.model.User user = userRepository.findByUsername(principal.getName()).orElse(null);
+            if (user != null && user.getBranch() != null) {
+                branchId = user.getBranch().getId();
+            }
+        }
+        return taqueriaService.getAllProducts(branchId);
     }
 
     @PostMapping("/orders")
@@ -29,6 +40,9 @@ public class TaqueriaController {
         if (principal != null) {
             com.taqueria.backend.model.User user = userRepository.findByUsername(principal.getName()).orElse(null);
             order.setUser(user);
+            if (user != null) {
+                order.setBranch(user.getBranch());
+            }
         }
         return taqueriaService.createOrder(order);
     }
@@ -43,14 +57,20 @@ public class TaqueriaController {
         return taqueriaService.updateOrder(id, order);
     }
 
+    @PutMapping("/orders/items/{itemId}/status")
+    public OrderItem updateOrderItemStatus(@PathVariable Long itemId, @RequestBody Map<String, String> payload) {
+        return taqueriaService.updateOrderItemStatus(itemId,
+                com.taqueria.backend.model.OrderStatus.valueOf(payload.get("status")));
+    }
+
     @GetMapping("/orders/table/{tableNumber}")
     public List<Order> getOrdersByTable(@PathVariable Integer tableNumber) {
         return taqueriaService.getOrdersByTable(tableNumber);
     }
 
     @PostMapping("/products")
-    public Product createProduct(@RequestBody Product product) {
-        return taqueriaService.saveProduct(product);
+    public Product createProduct(@RequestBody ProductDto productDto) {
+        return taqueriaService.saveProductWithPrices(productDto);
     }
 
     @PutMapping("/products/{id}")
@@ -62,6 +82,19 @@ public class TaqueriaController {
     @DeleteMapping("/products/{id}")
     public void deleteProduct(@PathVariable Long id) {
         taqueriaService.deleteProduct(id);
+    }
+
+    @PostMapping("/products/{id}/prices")
+    public com.taqueria.backend.model.BranchProduct setBranchPrice(@PathVariable Long id,
+            @RequestBody java.util.Map<String, Object> payload) {
+        Long branchId = Long.valueOf(payload.get("branchId").toString());
+        Double price = Double.valueOf(payload.get("price").toString());
+        return taqueriaService.setBranchPrice(branchId, id, price);
+    }
+
+    @GetMapping("/products/{id}/prices")
+    public java.util.Map<Long, Double> getProductBranchPrices(@PathVariable Long id) {
+        return taqueriaService.getProductBranchPrices(id);
     }
 
     @GetMapping("/extras")
@@ -95,5 +128,27 @@ public class TaqueriaController {
         String statusStr = statusMap.get("status");
         com.taqueria.backend.model.OrderStatus status = com.taqueria.backend.model.OrderStatus.valueOf(statusStr);
         return taqueriaService.updateOrderStatus(id, status);
+    }
+
+    // Category Endpoints
+    @GetMapping("/categories")
+    public List<Category> getAllCategories() {
+        return taqueriaService.getAllCategories();
+    }
+
+    @PostMapping("/categories")
+    public Category createCategory(@RequestBody Category category) {
+        return taqueriaService.saveCategory(category);
+    }
+
+    @PutMapping("/categories/{id}")
+    public Category updateCategory(@PathVariable Long id, @RequestBody Category category) {
+        category.setId(id);
+        return taqueriaService.saveCategory(category);
+    }
+
+    @DeleteMapping("/categories/{id}")
+    public void deleteCategory(@PathVariable Long id) {
+        taqueriaService.deleteCategory(id);
     }
 }

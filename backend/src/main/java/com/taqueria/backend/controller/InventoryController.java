@@ -85,7 +85,8 @@ public class InventoryController {
 
     // Alerts
     @GetMapping("/alerts")
-    public List<Supply> getLowStockAlerts() {
-        return inventoryService.getLowStockSupplies();
+    public List<com.taqueria.backend.model.BranchSupply> getLowStockAlerts(Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElseThrow();
+        return inventoryService.getLowStockSupplies(user.getId());
     }
 }

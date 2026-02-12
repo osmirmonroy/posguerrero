@@ -1,0 +1,32 @@
+package com.taqueria.backend.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "branch_products", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "branch_id", "product_id" })
+})
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class BranchProduct {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id", nullable = false)
+    private Branch branch;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @Column(nullable = false)
+    private Double price;
+}

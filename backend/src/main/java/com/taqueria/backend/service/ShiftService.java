@@ -38,6 +38,7 @@ public class ShiftService {
 
         Shift shift = new Shift();
         shift.setUser(user);
+        shift.setBranch(user.getBranch()); // Set branch from user
         shift.setStartTime(LocalDateTime.now());
         shift.setInitialCash(initialCash);
         shift.setStatus("OPEN");

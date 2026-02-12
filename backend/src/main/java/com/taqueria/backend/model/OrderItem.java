@@ -26,4 +26,7 @@ public class OrderItem {
     @ManyToMany
     @JoinTable(name = "order_item_extras", joinColumns = @JoinColumn(name = "order_item_id"), inverseJoinColumns = @JoinColumn(name = "extra_id"))
     private List<Extra> extras;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 }

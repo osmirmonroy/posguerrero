@@ -4,11 +4,19 @@ import com.taqueria.backend.model.Order;
 import com.taqueria.backend.model.OrderStatus;
 import com.taqueria.backend.model.Product;
 import com.taqueria.backend.model.Extra;
+import com.taqueria.backend.model.Branch;
+import com.taqueria.backend.model.OrderItem;
 import com.taqueria.backend.repository.ExtraRepository;
 import com.taqueria.backend.repository.OrderRepository;
 import com.taqueria.backend.repository.ProductRepository;
+import com.taqueria.backend.repository.OrderItemRepository;
+import com.taqueria.backend.repository.BranchProductRepository;
+import com.taqueria.backend.repository.BranchRepository;
+import com.taqueria.backend.model.Category;
+import com.taqueria.backend.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.taqueria.backend.dto.ProductDto;
 
 import java.time.LocalDateTime;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -30,8 +38,35 @@ public class TaqueriaService {
     @Autowired
     private ExtraRepository extraRepository;
 
+    @Autowired
+    private BranchProductRepository branchProductRepository;
+
+    @Autowired
+    private BranchRepository branchRepository;
+
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     public List<Product> getAllProducts() {
         return productRepository.findAll();
+    }
+
+    public List<Product> getAllProducts(Long branchId) {
+        List<Product> products = productRepository.findAll();
+        if (branchId != null) {
+            java.util.Map<Long, Double> branchPrices = branchProductRepository.findByBranchId(branchId).stream()
+                    .collect(java.util.stream.Collectors.toMap(bp -> bp.getProduct().getId(), bp -> bp.getPrice()));
+
+            for (Product p : products) {
+                if (branchPrices.containsKey(p.getId())) {
+                    p.setPrice(branchPrices.get(p.getId()));
+                }
+            }
+        }
+        return products;
     }
 
     public Order createOrder(Order order) {
@@ -46,12 +81,20 @@ public class TaqueriaService {
                 item.setOrder(order);
                 // In a real app, we should fetch product price from DB to avoid client-side
                 // manipulation
-                // For simplicity, assuming the client sends correct data or we trust it for
-                // now,
-                // but better to fetch price.
+                // Now fetching branch aware price if branch is set on order
                 Product p = productRepository.findById(item.getProduct().getId()).orElse(null);
                 if (p != null) {
-                    double itemPrice = p.getPrice();
+                    double itemPrice = p.getPrice(); // Default to global
+
+                    // Check for Branch Price override
+                    if (order.getBranch() != null) {
+                        var branchProduct = branchProductRepository
+                                .findByBranchIdAndProductId(order.getBranch().getId(), p.getId());
+                        if (branchProduct.isPresent()) {
+                            itemPrice = branchProduct.get().getPrice();
+                        }
+                    }
+
                     if (item.getExtras() != null) {
                         for (var extra : item.getExtras()) {
                             Extra e = extraRepository.findById(extra.getId()).orElse(null);
@@ -123,6 +166,23 @@ public class TaqueriaService {
         return productRepository.save(product);
     }
 
+    public Product saveProductWithPrices(ProductDto productDto) {
+        Product product = new Product();
+        product.setName(productDto.getName());
+        product.setPrice(productDto.getPrice());
+        product.setDescription(productDto.getDescription());
+        product.setCategory(productDto.getCategory());
+
+        Product savedProduct = productRepository.save(product);
+
+        if (productDto.getBranchPrices() != null) {
+            for (java.util.Map.Entry<Long, Double> entry : productDto.getBranchPrices().entrySet()) {
+                setBranchPrice(entry.getKey(), savedProduct.getId(), entry.getValue());
+            }
+        }
+        return savedProduct;
+    }
+
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
@@ -154,5 +214,58 @@ public class TaqueriaService {
             return updatedOrder;
         }
         return null;
+    }
+
+    public com.taqueria.backend.model.BranchProduct setBranchPrice(Long branchId, Long productId, Double price) {
+        com.taqueria.backend.model.Branch branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new RuntimeException("Branch not found"));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        java.util.Optional<com.taqueria.backend.model.BranchProduct> existing = branchProductRepository
+                .findByBranchIdAndProductId(branchId, productId);
+        com.taqueria.backend.model.BranchProduct branchProduct;
+        if (existing.isPresent()) {
+            branchProduct = existing.get();
+            branchProduct.setPrice(price);
+        } else {
+            branchProduct = com.taqueria.backend.model.BranchProduct.builder()
+                    .branch(branch)
+                    .product(product)
+                    .price(price)
+                    .build();
+        }
+        return branchProductRepository.save(branchProduct);
+    }
+
+    public java.util.Map<Long, Double> getProductBranchPrices(Long productId) {
+        return branchProductRepository.findByProductId(productId).stream()
+                .collect(java.util.stream.Collectors.toMap(bp -> bp.getBranch().getId(), bp -> bp.getPrice()));
+    }
+
+    public OrderItem updateOrderItemStatus(Long itemId, OrderStatus status) {
+        OrderItem item = orderItemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
+        item.setStatus(status);
+        OrderItem savedItem = orderItemRepository.save(item);
+
+        // Notify via WebSocket about the order update (we send the whole order for
+        // simplicity)
+        Order order = savedItem.getOrder();
+        messagingTemplate.convertAndSend("/topic/orders", order);
+
+        return savedItem;
+    }
+
+    // Category Methods
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
+    }
+
+    public Category saveCategory(Category category) {
+        return categoryRepository.save(category);
+    }
+
+    public void deleteCategory(Long id) {
+        categoryRepository.deleteById(id);
     }
 }

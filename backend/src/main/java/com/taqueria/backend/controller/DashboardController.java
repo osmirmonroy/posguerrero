@@ -18,41 +18,48 @@ import java.util.Arrays;
 @RequestMapping("/api/dashboard")
 public class DashboardController {
 
-    @Autowired
-    private OrderRepository orderRepository;
+        @Autowired
+        private OrderRepository orderRepository;
 
-    @Autowired
-    private InventoryService inventoryService;
+        @Autowired
+        private InventoryService inventoryService;
 
-    @GetMapping("/summary")
-    public DashboardSummaryDTO getDashboardSummary() {
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
+        @Autowired
+        private com.taqueria.backend.repository.UserRepository userRepository;
 
-        // 1. Daily Sales Total (PAID orders today)
-        // We can reuse the sumTotalByUserAndDateBetween but we need it for ALL users.
-        // Or find all valid sales today and sum.
-        // Let's create a quick stream calculation or repo query if simple.
-        // Repo query is best but let's do stream for MVP speed if repo method doesn't
-        // exist for "All Users".
-        // Actually, let's create a repo method findByDateBetweenAndStatus
+        @GetMapping("/summary")
+        public DashboardSummaryDTO getDashboardSummary(java.security.Principal principal) {
+                LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+                LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
 
-        // Fetching all paid orders today
-        Double dailySales = orderRepository.findAll().stream()
-                .filter(o -> o.getStatus() == OrderStatus.PAID &&
-                        o.getDate() != null &&
-                        !o.getDate().isBefore(startOfDay) &&
-                        !o.getDate().isAfter(endOfDay))
-                .mapToDouble(o -> o.getTotal() != null ? o.getTotal() : 0.0)
-                .sum();
+                com.taqueria.backend.model.User user = userRepository.findByUsername(principal.getName()).orElseThrow();
 
-        // 2. Active Orders Count (OPEN, PREPARING, READY, REOPENED)
-        Long activeOrders = orderRepository.findByStatusIn(Arrays.asList(
-                OrderStatus.OPEN, OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.REOPENED)).stream().count();
+                // 1. Daily Sales Total (PAID orders today)
+                // If user is branch restricted, filter by branch.
+                // For now, let's filter by user's branch if present.
+                // But dashboard is usually for the shop.
+                // We will improve this later. Use repository filter if we added one.
+                // Current repo findAll() gets everything.
+                // Let's assume global for now or refactor Dashboard later for full multi-branch
+                // filtering.
+                // But for Low Stock, we MUST pass userId.
 
-        // 3. Low Stock Items Count
-        Long lowStockCount = (long) inventoryService.getLowStockSupplies().size();
+                Double dailySales = orderRepository.findAll().stream()
+                                .filter(o -> o.getStatus() == OrderStatus.PAID &&
+                                                o.getDate() != null &&
+                                                !o.getDate().isBefore(startOfDay) &&
+                                                !o.getDate().isAfter(endOfDay))
+                                .mapToDouble(o -> o.getTotal() != null ? o.getTotal() : 0.0)
+                                .sum();
 
-        return new DashboardSummaryDTO(dailySales, activeOrders, lowStockCount);
-    }
+                // 2. Active Orders Count (OPEN, PREPARING, READY, REOPENED)
+                Long activeOrders = orderRepository.findByStatusIn(Arrays.asList(
+                                OrderStatus.OPEN, OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.REOPENED))
+                                .stream().count();
+
+                // 3. Low Stock Items Count
+                Long lowStockCount = (long) inventoryService.getLowStockSupplies(user.getId()).size();
+
+                return new DashboardSummaryDTO(dailySales, activeOrders, lowStockCount);
+        }
 }

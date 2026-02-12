@@ -16,6 +16,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.taqueria.backend.repository.BranchRepository branchRepository;
 
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
@@ -35,6 +36,11 @@ public class UserService {
                 .password(passwordEncoder.encode(userDto.getPassword())) // Hash password
                 .role(userDto.getRole())
                 .build();
+
+        if (userDto.getBranchId() != null) {
+            user.setBranch(branchRepository.findById(Long.valueOf(userDto.getBranchId())).orElse(null));
+        }
+
         User savedUser = userRepository.save(user);
         return mapToDto(savedUser);
     }
@@ -50,6 +56,12 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         }
 
+        if (userDto.getBranchId() != null) {
+            user.setBranch(branchRepository.findById(Long.valueOf(userDto.getBranchId())).orElse(null));
+        } else {
+            user.setBranch(null); // Allow unassigning branch
+        }
+
         User updatedUser = userRepository.save(user);
         return mapToDto(updatedUser);
     }
@@ -63,6 +75,8 @@ public class UserService {
                 .id(user.getId())
                 .username(user.getUsername())
                 .role(user.getRole())
+                .branchId(user.getBranch() != null ? user.getBranch().getId() : null)
+                .branchName(user.getBranch() != null ? user.getBranch().getName() : null)
                 // Do not return password
                 .build();
     }

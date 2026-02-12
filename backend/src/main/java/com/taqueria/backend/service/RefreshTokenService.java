@@ -24,14 +24,15 @@ public class RefreshTokenService {
     @Transactional
     public RefreshToken createRefreshToken(String username) {
         User user = userRepository.findByUsername(username).get();
-        // Delete existing refresh token if any for this user
-        refreshTokenRepository.deleteByUser(user);
 
-        RefreshToken refreshToken = RefreshToken.builder()
-                .user(user)
-                .token(UUID.randomUUID().toString())
-                .expiryDate(Instant.now().plusMillis(24 * 60 * 60 * 1000)) // 24 hours
-                .build();
+        RefreshToken refreshToken = refreshTokenRepository.findByUser(user)
+                .orElse(RefreshToken.builder()
+                        .user(user)
+                        .build());
+
+        refreshToken.setToken(UUID.randomUUID().toString());
+        refreshToken.setExpiryDate(Instant.now().plusMillis(24 * 60 * 60 * 1000)); // 24 hours
+
         return refreshTokenRepository.save(refreshToken);
     }
 
