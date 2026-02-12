@@ -1,29 +1,135 @@
+/* Product Grid Items */
 .product-grid-item {
     margin: .5em;
     border: 1px solid #dee2e6;
-    padding: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.product-grid-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
 }
 
 .product-grid-item-content {
     text-align: center;
+    flex: 1;
+}
+
+.product-icon {
+    padding: 1rem;
+    background: var(--surface-100);
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .product-name {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
+    min-height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .product-description {
     margin: 0.5rem 0 1rem 0;
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+    min-height: 2.5rem;
 }
 
 .product-price {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
 }
 
 .product-grid-item-bottom {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--surface-300);
+}
+
+/* Larger touch targets for buttons */
+.add-button ::ng-deep .p-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+/* Category Filter Chips */
+.category-chip {
+    border-radius: 20px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.category-chip:hover {
+    transform: scale(1.05);
+}
+
+/* Order Panel */
+.order-panel {
+    position: sticky;
+    top: 1rem;
+}
+
+.order-items-container {
+    background: var(--surface-50);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+}
+
+.order-total {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-600) 100%);
+    color: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.order-total .text-primary {
+    color: white !important;
+}
+
+/* Empty Order State */
+.empty-order {
+    background: var(--surface-50);
+    border-radius: var(--border-radius);
+    border: 2px dashed var(--surface-300);
+}
+
+/* Quantity Controls */
+::ng-deep .p-button-rounded.p-button-sm {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .product-grid-item {
+        min-height: 240px;
+    }
+
+    .order-panel {
+        position: relative;
+    }
+}
+
+/* Touch-friendly spacing */
+::ng-deep .p-button-lg {
+    padding: 0.875rem 1.75rem;
+    font-size: 1.125rem;
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Product, Order, Extra, SalesReportDTO, Shift, Supplier, Supply, InventoryTransaction, TopProduct, PaymentMethodStats, DashboardSummary } from '../models/taqueria.models';
+import { Product, Order, Extra, SalesReportDTO, Shift, Supplier, Supply, InventoryTransaction, TopProduct, PaymentMethodStats, DashboardSummary, OrderItem, Category } from '../models/taqueria.models';
 import { environment } from '../../environments/environment';
 
 
@@ -10,6 +10,8 @@ export interface User {
     username: string;
     password?: string;
     role: string;
+    branchId?: number;
+    branchName?: string;
 }
 
 
@@ -71,8 +73,20 @@ export class TaqueriaService {
         }
     }
 
+    createProduct(product: any): Observable<Product> {
+        return this.http.post<Product>(`${this.apiUrl}/products`, product);
+    }
+
     deleteProduct(id: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/products/${id}`);
+    }
+
+    setBranchPrice(productId: number, branchId: number, price: number): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/products/${productId}/prices`, { branchId, price });
+    }
+
+    getProductBranchPrices(productId: number): Observable<{ [key: number]: number }> {
+        return this.http.get<{ [key: number]: number }>(`${this.apiUrl}/products/${productId}/prices`);
     }
 
     getExtras(): Observable<Extra[]> {
@@ -93,6 +107,10 @@ export class TaqueriaService {
 
     updateOrderStatus(id: number, status: string): Observable<Order> {
         return this.http.patch<Order>(`${this.apiUrl}/orders/${id}/status`, { status });
+    }
+
+    updateOrderItemStatus(itemId: number, status: string): Observable<OrderItem> {
+        return this.http.put<OrderItem>(`${this.apiUrl}/orders/items/${itemId}/status`, { status });
     }
 
     deleteExtra(id: number): Observable<void> {
@@ -203,5 +221,22 @@ export class TaqueriaService {
 
     getDashboardSummary(): Observable<DashboardSummary> {
         return this.http.get<DashboardSummary>(`${this.apiUrl}/dashboard/summary`);
+    }
+
+    // Category Methods
+    getCategories(): Observable<Category[]> {
+        return this.http.get<Category[]>(`${this.apiUrl}/categories`);
+    }
+
+    saveCategory(category: Category): Observable<Category> {
+        if (category.id) {
+            return this.http.put<Category>(`${this.apiUrl}/categories/${category.id}`, category);
+        } else {
+            return this.http.post<Category>(`${this.apiUrl}/categories`, category);
+        }
+    }
+
+    deleteCategory(id: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/categories/${id}`);
     }
 }

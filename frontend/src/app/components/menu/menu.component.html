@@ -1,10 +1,11 @@
 <div class="grid">
     <div class="col-12 md:col-8">
         <div class="card">
+            <!-- Search and Layout Controls -->
             <div class="flex justify-content-between mb-3">
                 <span class="p-input-icon-left">
                     <i class="pi pi-search"></i>
-                    <input type="search" pInputText placeholder="Buscar por Nombre"
+                    <input type="search" pInputText placeholder="Buscar producto..."
                         (input)="filterProducts($any($event.target).value)">
                 </span>
                 <div class="flex gap-2">
@@ -15,21 +16,34 @@
                 </div>
             </div>
 
+            <!-- Category Filter Chips -->
+            <div class="flex gap-2 mb-3 flex-wrap">
+                <button *ngFor="let cat of categories" pButton [label]="cat" (click)="filterByCategory(cat)"
+                    [class]="selectedCategory === cat ? 'p-button-sm' : 'p-button-sm p-button-outlined'"
+                    class="category-chip">
+                </button>
+            </div>
+
+            <!-- Products Display -->
             <div *ngFor="let group of groupedProducts" class="mb-4">
                 <h4 class="mb-2">{{group.name}}</h4>
                 <p-dataView [value]="group.products" [layout]="layout">
                     <ng-template let-product pTemplate="gridItem">
-                        <div class="col-12 md:col-4">
+                        <div class="col-12 md:col-6 lg:col-4">
                             <div class="product-grid-item card m-2">
                                 <div class="product-grid-item-content">
+                                    <div class="product-icon mb-2">
+                                        <i class="pi pi-shopping-bag"
+                                            style="font-size: 2rem; color: var(--primary-color)"></i>
+                                    </div>
                                     <div class="product-name font-bold text-xl mb-2">{{product.name}}</div>
-                                    <div class="product-description text-700 mb-3">{{product.description}}</div>
+                                    <div class="product-description text-600 mb-3">{{product.description}}</div>
                                 </div>
                                 <div class="product-grid-item-bottom flex justify-content-between align-items-center">
-                                    <span class="product-price text-xl font-semibold">{{product.price |
+                                    <span class="product-price text-2xl font-bold text-primary">{{product.price |
                                         currency}}</span>
-                                    <p-button icon="pi pi-plus" (click)="openExtrasDialog(product)"
-                                        label="Agregar"></p-button>
+                                    <p-button icon="pi pi-plus" (click)="openExtrasDialog(product)" label="Agregar"
+                                        class="add-button"></p-button>
                                 </div>
                             </div>
                         </div>
@@ -51,9 +65,9 @@
                                     </div>
                                     <div
                                         class="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                                        <span class="text-2xl font-semibold">{{ product.price | currency }}</span>
-                                        <button pButton icon="pi pi-plus"
-                                            class="md:align-self-end mb-2 p-button-rounded"
+                                        <span class="text-2xl font-semibold text-primary">{{ product.price | currency
+                                            }}</span>
+                                        <button pButton icon="pi pi-plus" label="Agregar" class="p-button-lg"
                                             (click)="openExtrasDialog(product)"></button>
                                     </div>
                                 </div>
@@ -65,51 +79,81 @@
             </div>
         </div>
     </div>
+
+    <!-- Order Panel -->
     <div class="col-12 md:col-4">
-        <div class="card">
-            <h5>Gestión de Pedido</h5>
-            <div class="p-fluid">
-                <div class="field">
-                    <button pButton label="Nuevo Pedido" icon="pi pi-plus" (click)="startNewOrder()"
-                        class="p-button-success mb-2"></button>
-                </div>
+        <div class="card order-panel">
+            <h5 class="mb-3">Pedido Actual</h5>
+
+            <!-- Customer Name Input -->
+            <div class="p-fluid mb-3">
+                <span class="p-float-label">
+                    <input id="customerName" type="text" pInputText [(ngModel)]="customerName">
+                    <label for="customerName">Nombre del Cliente</label>
+                </span>
             </div>
 
-            <div *ngIf="orderItems.length > 0 || currentOrder">
-                <h5>Pedido Actual <span *ngIf="currentOrder">#{{currentOrder.id}} ({{currentOrder.status}})</span></h5>
-                <p-table [value]="orderItems" [scrollable]="true" scrollHeight="300px">
+            <!-- Order Items -->
+            <div *ngIf="orderItems.length > 0" class="order-items-container">
+                <p-table [value]="orderItems" [scrollable]="true" scrollHeight="400px">
                     <ng-template pTemplate="header">
                         <tr>
                             <th>Producto</th>
-                            <th>Cant</th>
-                            <th>Precio</th>
+                            <th style="width: 120px">Cant.</th>
+                            <th style="width: 100px">Total</th>
+                            <th style="width: 50px"></th>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-item>
                         <tr>
                             <td>
-                                {{item.product.name}}
+                                <div class="font-semibold">{{item.product.name}}</div>
                                 <div *ngIf="item.extras && item.extras.length > 0" class="text-sm text-500">
                                     <span *ngFor="let extra of item.extras; let last = last">
-                                        + {{extra.name}} (\${{extra.price}}){{!last ? ', ' : ''}}
+                                        + {{extra.name}}{{!last ? ', ' : ''}}
                                     </span>
                                 </div>
                             </td>
-                            <td>{{item.quantity}}</td>
                             <td>
+                                <div class="flex align-items-center gap-2">
+                                    <button pButton icon="pi pi-minus"
+                                        class="p-button-rounded p-button-text p-button-sm"
+                                        (click)="updateQuantity(item, -1)"></button>
+                                    <span class="font-bold text-lg">{{item.quantity}}</span>
+                                    <button pButton icon="pi pi-plus" class="p-button-rounded p-button-text p-button-sm"
+                                        (click)="updateQuantity(item, 1)"></button>
+                                </div>
+                            </td>
+                            <td class="font-semibold">
                                 {{ getItemTotal(item) | currency }}
+                            </td>
+                            <td>
+                                <button pButton icon="pi pi-trash"
+                                    class="p-button-rounded p-button-danger p-button-text p-button-sm"
+                                    (click)="removeItem(item)"></button>
                             </td>
                         </tr>
                     </ng-template>
                 </p-table>
 
-                <div class="p-fluid mt-3">
-                    <button pButton label="Enviar Pedido" icon="pi pi-check" class="mb-2" (click)="sendOrder()"
-                        [disabled]="orderItems.length === 0 || (currentOrder && currentOrder.status !== 'OPEN' && currentOrder.status !== 'REOPENED')"></button>
+                <!-- Order Total -->
+                <div class="order-total mt-3 p-3 surface-100 border-round">
+                    <div class="flex justify-content-between align-items-center">
+                        <span class="text-xl font-bold">TOTAL:</span>
+                        <span class="text-3xl font-bold text-primary">{{ getOrderTotal() | currency }}</span>
+                    </div>
+                </div>
 
-                    <div class="grid" *ngIf="currentOrder">
+                <!-- Action Buttons -->
+                <div class="p-fluid mt-3">
+                    <button pButton label="Enviar a Cocina" icon="pi pi-send" class="mb-2 p-button-lg p-button-success"
+                        (click)="sendOrder()"
+                        [disabled]="orderItems.length === 0 || (currentOrder && currentOrder.status !== 'OPEN' && currentOrder.status !== 'REOPENED')">
+                    </button>
+
+                    <div class="grid" *ngIf="currentOrder && currentOrder.id">
                         <div class="col-6">
-                            <button pButton label="Entregar" icon="pi pi-send" class="p-button-info"
+                            <button pButton label="Entregar" icon="pi pi-check" class="p-button-info"
                                 (click)="updateStatus(OrderStatus.DELIVERED)"
                                 [disabled]="currentOrder.status !== 'OPEN' && currentOrder.status !== 'REOPENED'"></button>
                         </div>
@@ -124,18 +168,31 @@
                                 [disabled]="currentOrder.status === 'PAID'"></button>
                         </div>
                     </div>
+
+                    <button pButton label="Cancelar Pedido" icon="pi pi-times"
+                        class="mt-2 p-button-danger p-button-outlined" (click)="clearOrder()"
+                        [disabled]="orderItems.length === 0">
+                    </button>
                 </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="orderItems.length === 0" class="empty-order text-center p-5">
+                <i class="pi pi-shopping-cart text-6xl text-400 mb-3"></i>
+                <p class="text-600 text-lg">No hay items en el pedido</p>
+                <p class="text-500">Agrega productos del menú para comenzar</p>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Extras Dialog -->
 <p-dialog header="Seleccionar Extras" [(visible)]="extrasDialog" [modal]="true" [style]="{width: '50vw'}">
     <div class="flex flex-column gap-2" *ngIf="extras.length > 0">
         <div *ngFor="let extra of extras" class="field-checkbox">
             <p-checkbox name="group" [value]="extra" [(ngModel)]="selectedExtras"
                 [inputId]="'extra' + extra.id"></p-checkbox>
-            <label [for]="'extra' + extra.id" class="ml-2">{{extra.name}} (+\${{extra.price}})</label>
+            <label [for]="'extra' + extra.id" class="ml-2">{{extra.name}} (+${{extra.price}})</label>
         </div>
     </div>
     <div *ngIf="extras.length === 0">No hay extras disponibles.</div>

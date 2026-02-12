@@ -19,6 +19,13 @@ body {
 .p-button {
     background: var(--primary-color) !important;
     border: 1px solid var(--primary-color) !important;
+    color: #ffffff !important;
+}
+
+.p-button.p-button-danger {
+    background: #d32f2f !important;
+    border: 1px solid #d32f2f !important;
+    color: #ffffff !important;
 }
 
 .p-button:enabled:hover {

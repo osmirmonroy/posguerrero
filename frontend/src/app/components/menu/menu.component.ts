@@ -15,11 +15,14 @@ export class MenuComponent implements OnInit {
   groupedProducts: { name: string, products: Product[] }[] = [];
   layout: 'list' | 'grid' = 'grid';
   currentOrder: Order | null = null;
+  customerName: string = '';
   orderItems: OrderItem[] = [];
   extras: Extra[] = [];
   selectedExtras: Extra[] = [];
   selectedProduct: Product | null = null;
   extrasDialog: boolean = false;
+  selectedCategory: string = 'Todos';
+  categories: string[] = [];
 
   constructor(
     private taqueriaService: TaqueriaService,
@@ -27,14 +30,28 @@ export class MenuComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.taqueriaService.getProducts().subscribe(data => {
-      this.allProducts = data;
-      this.products = [...this.allProducts];
-      this.groupProducts();
+    this.taqueriaService.getProducts().subscribe({
+      next: (data) => {
+        this.allProducts = data;
+        this.products = [...this.allProducts];
+        this.groupProducts();
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los productos' });
+      }
     });
     this.taqueriaService.getExtras().subscribe(data => {
       this.extras = data;
     });
+    this.loadCategories();
+  }
+
+  loadCategories() {
+    const categorySet = new Set<string>();
+    this.allProducts.forEach(p => {
+      if (p.category) categorySet.add(p.category);
+    });
+    this.categories = ['Todos', ...Array.from(categorySet)];
   }
 
   groupProducts() {
@@ -65,6 +82,7 @@ export class MenuComponent implements OnInit {
   startNewOrder() {
     this.currentOrder = null;
     this.orderItems = [];
+    this.customerName = '';
     this.messageService.add({ severity: 'info', summary: 'Nuevo Pedido', detail: 'Iniciando un nuevo pedido.' });
   }
 
@@ -79,11 +97,21 @@ export class MenuComponent implements OnInit {
 
   confirmExtras() {
     if (this.selectedProduct) {
+      // Auto-start order if needed
+      if (!this.currentOrder && this.orderItems.length === 0) {
+        this.currentOrder = { items: [], status: OrderStatus.OPEN };
+      }
+
+      const productName = this.selectedProduct.name; // Capture name before clearing
+
       this.orderItems.push({
         product: this.selectedProduct,
         quantity: 1,
         extras: this.selectedExtras
       });
+
+      this.messageService.add({ severity: 'success', summary: 'Item Agregado', detail: `${productName} agregado al pedido`, life: 2000 });
+
       this.extrasDialog = false;
       this.selectedProduct = null;
       this.selectedExtras = [];
@@ -94,20 +122,33 @@ export class MenuComponent implements OnInit {
     const order: Order = {
       id: this.currentOrder?.id,
       items: this.orderItems,
-      status: this.currentOrder ? this.currentOrder.status : OrderStatus.OPEN
+      status: this.currentOrder ? this.currentOrder.status : OrderStatus.OPEN,
+      customerName: this.customerName
     };
 
     if (this.currentOrder && this.currentOrder.id) {
-      this.taqueriaService.updateOrder(this.currentOrder.id, order).subscribe(updatedOrder => {
-        this.currentOrder = updatedOrder;
-        this.orderItems = updatedOrder.items;
-        this.messageService.add({ severity: 'success', summary: 'Pedido Actualizado', detail: 'Pedido enviado a cocina' });
+      this.taqueriaService.updateOrder(this.currentOrder.id, order).subscribe({
+        next: (updatedOrder) => {
+          this.currentOrder = updatedOrder;
+          this.orderItems = updatedOrder.items;
+          this.customerName = updatedOrder.customerName || '';
+          this.messageService.add({ severity: 'success', summary: 'Pedido Actualizado', detail: 'Pedido enviado a cocina' });
+        },
+        error: () => {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar el pedido' });
+        }
       });
     } else {
-      this.taqueriaService.createOrder(order).subscribe(newOrder => {
-        this.currentOrder = newOrder;
-        this.orderItems = newOrder.items;
-        this.messageService.add({ severity: 'success', summary: 'Pedido Creado', detail: 'Pedido creado exitosamente' });
+      this.taqueriaService.createOrder(order).subscribe({
+        next: (newOrder) => {
+          this.currentOrder = newOrder;
+          this.orderItems = newOrder.items;
+          this.customerName = newOrder.customerName || '';
+          this.messageService.add({ severity: 'success', summary: 'Pedido Creado', detail: 'Pedido creado exitosamente' });
+        },
+        error: () => {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo crear el pedido' });
+        }
       });
     }
   }
@@ -115,12 +156,17 @@ export class MenuComponent implements OnInit {
   updateStatus(status: OrderStatus) {
     if (this.currentOrder && this.currentOrder.id) {
       const updatedOrder = { ...this.currentOrder, status: status };
-      this.taqueriaService.updateOrder(this.currentOrder.id, updatedOrder).subscribe(order => {
-        this.currentOrder = order;
-        this.messageService.add({ severity: 'success', summary: 'Estado Actualizado', detail: `Estado del pedido cambiado a ${status}` });
-        if (status === OrderStatus.PAID) {
-          this.currentOrder = null;
-          this.orderItems = [];
+      this.taqueriaService.updateOrder(this.currentOrder.id, updatedOrder).subscribe({
+        next: (order) => {
+          this.currentOrder = order;
+          this.messageService.add({ severity: 'success', summary: 'Estado Actualizado', detail: `Estado del pedido cambiado a ${status}` });
+          if (status === OrderStatus.PAID) {
+            this.currentOrder = null;
+            this.orderItems = [];
+          }
+        },
+        error: () => {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar el estado' });
         }
       });
     }
@@ -136,5 +182,41 @@ export class MenuComponent implements OnInit {
       price += item.extras.reduce((sum, e) => sum + e.price, 0);
     }
     return price * item.quantity;
+  }
+
+  updateQuantity(item: OrderItem, delta: number) {
+    item.quantity += delta;
+    if (item.quantity <= 0) {
+      this.removeItem(item);
+    }
+  }
+
+  removeItem(item: OrderItem) {
+    const index = this.orderItems.indexOf(item);
+    if (index > -1) {
+      this.orderItems.splice(index, 1);
+      this.messageService.add({ severity: 'info', summary: 'Item Eliminado', detail: 'Item removido del pedido', life: 2000 });
+    }
+  }
+
+  getOrderTotal(): number {
+    return this.orderItems.reduce((sum, item) => sum + this.getItemTotal(item), 0);
+  }
+
+  filterByCategory(category: string) {
+    this.selectedCategory = category;
+    if (category === 'Todos') {
+      this.products = [...this.allProducts];
+    } else {
+      this.products = this.allProducts.filter(p => p.category === category);
+    }
+    this.groupProducts();
+  }
+
+  clearOrder() {
+    this.currentOrder = null;
+    this.orderItems = [];
+    this.customerName = '';
+    this.messageService.add({ severity: 'info', summary: 'Pedido Cancelado', detail: 'El pedido fue cancelado', life: 2000 });
   }
 }

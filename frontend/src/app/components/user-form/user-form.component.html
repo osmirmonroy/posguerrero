@@ -20,6 +20,13 @@
                     optionValue="value" styleClass="w-full"></p-dropdown>
             </div>
 
+            <div class="field mb-5">
+                <label for="branch" class="block font-medium mb-2">Sucursal</label>
+                <p-dropdown [options]="branches" [(ngModel)]="user.branchId" name="branch" optionLabel="name"
+                    optionValue="id" styleClass="w-full" placeholder="Seleccionar Sucursal"
+                    [showClear]="true"></p-dropdown>
+            </div>
+
             <div class="flex justify-content-end gap-2">
                 <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-secondary p-button-text"
                     routerLink="/users"></p-button>

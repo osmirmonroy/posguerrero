@@ -11,6 +11,7 @@
                     <th>ID</th>
                     <th>Usuario</th>
                     <th>Rol</th>
+                    <th>Sucursal</th>
                     <th>Acciones</th>
                 </tr>
             </ng-template>
@@ -20,6 +21,7 @@
                     <td>{{ user.username }}</td>
                     <td><span [class]="'product-badge status-' + (user.role === 'ADMIN' ? 'instock' : 'lowstock')">{{
                             user.role }}</span></td>
+                    <td>{{ user.branchName || 'Sin sucursal' }}</td>
                     <td>
                         <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-info mr-2"
                             [routerLink]="['/users/edit', user.id]"></p-button>

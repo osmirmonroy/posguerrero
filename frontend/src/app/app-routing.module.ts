@@ -5,6 +5,7 @@ import { OrderListComponent } from './components/order-list/order-list.component
 import { UserListComponent } from './components/user-list/user-list.component';
 import { UserFormComponent } from './components/user-form/user-form.component';
 import { ProductCrudComponent } from './components/product-crud/product-crud.component';
+import { CategoryCrudComponent } from './components/category-crud/category-crud.component';
 import { ExtrasCrudComponent } from './components/extras-crud/extras-crud.component';
 import { SalesReportComponent } from './components/sales-report/sales-report.component';
 import { LoginComponent } from './components/login/login.component';
@@ -15,6 +16,7 @@ import { ShiftControlComponent } from './components/shift-control/shift-control.
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { InventoryListComponent } from './components/inventory-list/inventory-list.component';
 import { SupplierCrudComponent } from './components/supplier-crud/supplier-crud.component';
+import { BranchListComponent } from './components/branch-list/branch-list.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -22,6 +24,7 @@ const routes: Routes = [
   { path: 'menu', component: MenuComponent, canActivate: [AuthGuard] },
   { path: 'orders', component: OrderListComponent, canActivate: [AuthGuard] },
   { path: 'admin/products', component: ProductCrudComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
+  { path: 'admin/categories', component: CategoryCrudComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
   { path: 'admin/extras', component: ExtrasCrudComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
   { path: 'admin/reports/sales', component: SalesReportComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
   { path: 'users', component: UserListComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
@@ -32,7 +35,8 @@ const routes: Routes = [
   { path: 'admin/suppliers', component: SupplierCrudComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
   { path: 'kitchen', component: KitchenDashboardComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'COCINERO' } },
   { path: 'shifts', component: ShiftControlComponent, canActivate: [AuthGuard] },
-  { path: 'admin/dashboard', component: AdminDashboardComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } }
+  { path: 'admin/dashboard', component: AdminDashboardComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } },
+  { path: 'admin/branches', component: BranchListComponent, canActivate: [AuthGuard, RoleGuard], data: { expectedRole: 'ADMIN' } }
 ];
 
 @NgModule({

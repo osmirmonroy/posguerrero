@@ -11,9 +11,9 @@ import { Subscription, interval } from 'rxjs';
 })
 export class KitchenDashboardComponent implements OnInit, OnDestroy {
   orders: Order[] = [];
-  openOrders: Order[] = [];
-  preparingOrders: Order[] = [];
-  readyOrders: Order[] = [];
+  pendingItems: { order: Order, item: any }[] = [];
+  preparingItems: { order: Order, item: any }[] = [];
+  readyItems: { order: Order, item: any }[] = [];
 
   private wsSubscription: Subscription | undefined;
   private timerSubscription: Subscription | undefined;
@@ -75,21 +75,58 @@ export class KitchenDashboardComponent implements OnInit, OnDestroy {
   }
 
   categorizeOrders(): void {
-    this.openOrders = this.orders.filter(o => o.status === OrderStatus.OPEN).sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
-    this.preparingOrders = this.orders.filter(o => o.status === OrderStatus.PREPARING).sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
-    this.readyOrders = this.orders.filter(o => o.status === OrderStatus.READY).sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
+    this.pendingItems = [];
+    this.preparingItems = [];
+    this.readyItems = [];
+
+    this.orders.forEach(order => {
+      if (order.items) {
+        order.items.forEach(item => {
+          const wrapper = { order, item };
+          // Default to OPEN if status is missing
+          const status = item.status || 'OPEN';
+
+          if (status === 'OPEN' || status === 'REOPENED') {
+            this.pendingItems.push(wrapper);
+          } else if (status === 'PREPARING') {
+            this.preparingItems.push(wrapper);
+          } else if (status === 'READY') {
+            this.readyItems.push(wrapper);
+          }
+        });
+      }
+    });
+
+    // Sort by time
+    const sortByDate = (a: any, b: any) => new Date(a.order.date!).getTime() - new Date(b.order.date!).getTime();
+    this.pendingItems.sort(sortByDate);
+    this.preparingItems.sort(sortByDate);
+    this.readyItems.sort(sortByDate);
+  }
+
+  updateItemStatus(item: any, newStatus: string): void {
+    if (item.id) {
+      this.taqueriaService.updateOrderItemStatus(item.id, newStatus).subscribe({
+        next: (updatedItem) => {
+          // Find order and item to update locally
+          for (let o of this.orders) {
+            if (o.items) {
+              const i = o.items.find(it => it.id === updatedItem.id);
+              if (i) {
+                i.status = updatedItem.status;
+                break;
+              }
+            }
+          }
+          this.categorizeOrders();
+        },
+        error: (err) => console.error('Failed to update item status', err)
+      });
+    }
   }
 
   updateStatus(order: Order, newStatus: string): void {
-    if (order.id) {
-      this.taqueriaService.updateOrderStatus(order.id, newStatus).subscribe({
-        next: (updated) => {
-          // Optimistic update handled by WS usually, but good to have here too
-          this.handleOrderUpdate(updated);
-        },
-        error: (err) => console.error('Failed to update status', err)
-      });
-    }
+    // Legacy method, keeping empty or redirecting if needed, but UI will use updateItemStatus
   }
 
   getElapsedTime(dateStr: string | undefined): string {

@@ -9,11 +9,13 @@ import { AuthService } from './services/auth.service';
 })
 export class AppComponent implements OnInit {
   items: MenuItem[] = [];
+  currentUser: any;
 
   constructor(private authService: AuthService) { }
 
   ngOnInit() {
     this.authService.currentUser.subscribe(user => {
+      this.currentUser = user;
       this.updateMenu(user);
     });
   }
@@ -32,7 +34,7 @@ export class AppComponent implements OnInit {
 
     this.items.push(
       {
-        label: 'Menú',
+        label: 'Crear Orden',
         icon: 'pi pi-fw pi-list',
         routerLink: '/menu'
       },
@@ -51,15 +53,17 @@ export class AppComponent implements OnInit {
           routerLink: '/admin/dashboard'
         },
         {
-          label: 'Admin Productos',
-          icon: 'pi pi-fw pi-cog',
-          routerLink: '/admin/products'
+          label: 'Catálogos',
+          icon: 'pi pi-fw pi-list',
+          items: [
+            { label: 'Productos', icon: 'pi pi-fw pi-cog', routerLink: '/admin/products' },
+            { label: 'Categorías', icon: 'pi pi-fw pi-tags', routerLink: '/admin/categories' },
+            { label: 'Extras', icon: 'pi pi-fw pi-plus-circle', routerLink: '/admin/extras' },
+            { label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: '/users' },
+            { label: 'Sucursales', icon: 'pi pi-fw pi-building', routerLink: '/admin/branches' }
+          ]
         },
-        {
-          label: 'Admin Extras',
-          icon: 'pi pi-fw pi-plus-circle',
-          routerLink: '/admin/extras'
-        },
+
         {
           label: 'Inventario',
           icon: 'pi pi-fw pi-box',
@@ -73,11 +77,7 @@ export class AppComponent implements OnInit {
           icon: 'pi pi-fw pi-chart-bar',
           routerLink: '/admin/reports/sales'
         },
-        {
-          label: 'Usuarios',
-          icon: 'pi pi-fw pi-users',
-          routerLink: '/users'
-        }
+
       );
     }
 

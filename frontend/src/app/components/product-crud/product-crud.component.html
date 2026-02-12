@@ -33,6 +33,8 @@
                 <td>{{product.category}}</td>
                 <td>{{product.description}}</td>
                 <td>
+                    <button pButton pRipple icon="pi pi-dollar" class="p-button-rounded p-button-info mr-2"
+                        (click)="openPricingDialog(product)" pTooltip="Precios por Sucursal"></button>
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
                         (click)="editProduct(product)"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
@@ -67,9 +69,20 @@
                 cols="20"></textarea>
         </div>
         <div class="field">
-            <label for="price">Precio</label>
+            <label for="price">Precio Base</label>
             <p-inputNumber id="price" [(ngModel)]="product.price" mode="currency" currency="USD"
                 locale="en-US"></p-inputNumber>
+        </div>
+
+        <div *ngIf="!product.id" class="field">
+            <label class="font-bold block mb-2">Precios Iniciales por Sucursal (Opcional)</label>
+            <div *ngFor="let branch of branches" class="field grid align-items-center">
+                <label class="col-6 mb-0">{{branch.name}}</label>
+                <div class="col-6">
+                    <p-inputNumber [(ngModel)]="branchPrices[branch.id!]" mode="currency" currency="USD" locale="en-US"
+                        placeholder="Igual al base"></p-inputNumber>
+                </div>
+            </div>
         </div>
     </ng-template>
 
@@ -78,6 +91,32 @@
             (click)="hideDialog()"></button>
         <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text"
             (click)="saveProduct()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- Pricing Dialog -->
+<p-dialog [(visible)]="pricingDialog" [style]="{width: '500px'}" header="Precios por Sucursal" [modal]="true"
+    styleClass="p-fluid">
+    <ng-template pTemplate="content">
+        <span *ngIf="currentProductForPricing" class="block mb-3">Producto:
+            <strong>{{currentProductForPricing.name}}</strong> (Base: {{currentProductForPricing.price |
+            currency}})</span>
+
+        <div class="p-fluid">
+            <div *ngFor="let branch of branches" class="field grid align-items-center">
+                <label class="col-12 mb-2 md:col-6 md:mb-0">{{branch.name}}</label>
+                <div class="col-12 md:col-6 flex gap-2">
+                    <p-inputNumber [(ngModel)]="branchPrices[branch.id!]" mode="currency" currency="USD"
+                        locale="en-US"></p-inputNumber>
+                    <button pButton icon="pi pi-check" class="p-button-rounded p-button-text p-button-success"
+                        (click)="saveBranchPrice(branch.id!)" pTooltip="Guardar Precio"></button>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cerrar" icon="pi pi-times" class="p-button-text"
+            (click)="pricingDialog = false"></button>
     </ng-template>
 </p-dialog>
 

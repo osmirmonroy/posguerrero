@@ -4,6 +4,7 @@ export interface Product {
     price: number;
     description: string;
     category?: string;
+    branchPrices?: { [key: number]: number };
 }
 
 export interface Extra {
@@ -17,6 +18,7 @@ export interface OrderItem {
     product: Product;
     quantity: number;
     extras?: Extra[];
+    status?: string;
 }
 
 export enum OrderStatus {
@@ -103,4 +105,10 @@ export interface DashboardSummary {
     dailySalesTotal: number;
     activeOrdersCount: number;
     lowStockItemsCount: number;
+}
+
+export interface Category {
+    id?: number;
+    name: string;
+    description?: string;
 }

@@ -4,6 +4,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
+import { LoadingInterceptor } from './interceptors/loading.interceptor';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -26,6 +27,7 @@ import { DividerModule } from 'primeng/divider';
 import { DropdownModule } from 'primeng/dropdown';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ProductCrudComponent } from './components/product-crud/product-crud.component';
+import { CategoryCrudComponent } from './components/category-crud/category-crud.component';
 import { ExtrasCrudComponent } from './components/extras-crud/extras-crud.component';
 import { SalesReportComponent } from './components/sales-report/sales-report.component';
 import { CalendarModule } from 'primeng/calendar';
@@ -41,6 +43,8 @@ import { InventoryListComponent } from './components/inventory-list/inventory-li
 import { SupplierCrudComponent } from './components/supplier-crud/supplier-crud.component';
 import { KardexViewComponent } from './components/kardex-view/kardex-view.component';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
+import { BranchListComponent } from './components/branch-list/branch-list.component';
+import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +52,7 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
     MenuComponent,
     OrderListComponent,
     ProductCrudComponent,
+    CategoryCrudComponent,
     ExtrasCrudComponent,
     SalesReportComponent,
     LoginComponent,
@@ -59,7 +64,11 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
     SupplierCrudComponent,
     SupplierCrudComponent,
     KardexViewComponent,
-    AdminDashboardComponent
+    SupplierCrudComponent,
+    KardexViewComponent,
+    AdminDashboardComponent,
+    BranchListComponent,
+    LoadingSpinnerComponent
   ],
   imports: [
     BrowserModule,
@@ -91,7 +100,8 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
   providers: [
     MessageService,
     ConfirmationService,
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })
