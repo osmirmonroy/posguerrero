@@ -3,6 +3,15 @@
     <img src="assets/logo.jpg" alt="Taqueria Logo" style="height:100px;margin:10px;position: relative;">
   </ng-template>
   <ng-template pTemplate="end">
+    <!-- Branch Selector for ADMIN -->
+    <div *ngIf="currentUser?.role === 'ADMIN' && branches.length > 0" class="flex align-items-center gap-2 mr-3">
+      <i class="pi pi-building text-primary"></i>
+      <p-dropdown [options]="branches" [(ngModel)]="selectedBranchId" (onChange)="onBranchChange()" optionLabel="name"
+        optionValue="id" placeholder="Todas las Sucursales" [showClear]="true" [style]="{'min-width': '200px'}">
+      </p-dropdown>
+    </div>
+
+    <!-- User Info -->
     <div *ngIf="currentUser" class="flex align-items-center gap-2 mr-3">
       <span class="font-bold"><i class="pi pi-user mr-1"></i>{{currentUser.username}}</span>
       <span class="text-sm">({{currentUser.role}})</span>

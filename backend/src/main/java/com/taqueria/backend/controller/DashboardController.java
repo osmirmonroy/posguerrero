@@ -28,7 +28,9 @@ public class DashboardController {
         private com.taqueria.backend.repository.UserRepository userRepository;
 
         @GetMapping("/summary")
-        public DashboardSummaryDTO getDashboardSummary(java.security.Principal principal) {
+        public DashboardSummaryDTO getDashboardSummary(
+                        @org.springframework.web.bind.annotation.RequestParam(required = false) Long branchId,
+                        java.security.Principal principal) {
                 LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
                 LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
 
@@ -48,17 +50,22 @@ public class DashboardController {
                                 .filter(o -> o.getStatus() == OrderStatus.PAID &&
                                                 o.getDate() != null &&
                                                 !o.getDate().isBefore(startOfDay) &&
-                                                !o.getDate().isAfter(endOfDay))
+                                                !o.getDate().isAfter(endOfDay) &&
+                                                (branchId == null || (o.getBranch() != null
+                                                                && o.getBranch().getId().equals(branchId))))
                                 .mapToDouble(o -> o.getTotal() != null ? o.getTotal() : 0.0)
                                 .sum();
 
                 // 2. Active Orders Count (OPEN, PREPARING, READY, REOPENED)
                 Long activeOrders = orderRepository.findByStatusIn(Arrays.asList(
                                 OrderStatus.OPEN, OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.REOPENED))
-                                .stream().count();
+                                .stream()
+                                .filter(o -> branchId == null
+                                                || (o.getBranch() != null && o.getBranch().getId().equals(branchId)))
+                                .count();
 
                 // 3. Low Stock Items Count
-                Long lowStockCount = (long) inventoryService.getLowStockSupplies(user.getId()).size();
+                Long lowStockCount = (long) inventoryService.getLowStockSupplies(user.getId(), branchId).size();
 
                 return new DashboardSummaryDTO(dailySales, activeOrders, lowStockCount);
         }

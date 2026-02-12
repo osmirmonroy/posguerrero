@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Supply, Supplier } from '../../models/taqueria.models';
 import { TaqueriaService } from '../../services/taqueria.service';
+import { BranchService } from '../../services/branch.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 @Component({
@@ -27,17 +28,20 @@ export class InventoryListComponent implements OnInit {
 
   constructor(
     private taqueriaService: TaqueriaService,
+    private branchService: BranchService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit(): void {
-    this.loadSupplies();
+    this.branchService.selectedBranch$.subscribe(branchId => {
+      this.loadSupplies(branchId || undefined);
+    });
     this.loadSuppliers();
   }
 
-  loadSupplies() {
-    this.taqueriaService.getSupplies().subscribe(data => this.supplies = data);
+  loadSupplies(branchId?: number) {
+    this.taqueriaService.getSupplies(branchId).subscribe(data => this.supplies = data);
   }
 
   loadSuppliers() {

@@ -16,6 +16,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
         List<Order> findByStatusIn(List<OrderStatus> statuses);
 
+        List<Order> findByStatusInAndBranchId(List<OrderStatus> statuses, Long branchId);
+
+        List<Order> findByBranchId(Long branchId);
+
         @Query("SELECT COALESCE(SUM(o.total), 0) FROM Order o WHERE o.user = :user AND o.status = 'PAID' AND o.date BETWEEN :startTime AND :endTime")
         Double sumTotalByUserAndDateBetween(@Param("user") User user, @Param("startTime") LocalDateTime startTime,
                         @Param("endTime") LocalDateTime endTime);
@@ -24,18 +28,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                         +
                         "FROM OrderItem i JOIN i.order o " +
                         "WHERE o.status = 'PAID' AND o.date BETWEEN :startTime AND :endTime " +
+                        "AND (:branchId IS NULL OR o.branch.id = :branchId) " +
                         "GROUP BY i.product.name " +
                         "ORDER BY SUM(i.quantity) DESC")
         List<com.taqueria.backend.dto.TopProductDTO> findTopSellingProducts(@Param("startTime") LocalDateTime startTime,
-                        @Param("endTime") LocalDateTime endTime);
+                        @Param("endTime") LocalDateTime endTime, @Param("branchId") Long branchId);
 
         @Query("SELECT new com.taqueria.backend.dto.PaymentMethodStatsDTO(CAST(o.paymentMethod as string), COUNT(o), SUM(o.total)) "
                         +
                         "FROM Order o " +
                         "WHERE o.status = 'PAID' AND o.date BETWEEN :startTime AND :endTime " +
+                        "AND (:branchId IS NULL OR o.branch.id = :branchId) " +
                         "GROUP BY o.paymentMethod")
         List<com.taqueria.backend.dto.PaymentMethodStatsDTO> findPaymentMethodStats(
-                        @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+                        @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime,
+                        @Param("branchId") Long branchId);
 
         // Fix for PaymentMethod enum query if needed:
         // Actually enum group by might need care. Using string representation or

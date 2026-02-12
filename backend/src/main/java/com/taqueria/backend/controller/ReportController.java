@@ -29,30 +29,34 @@ public class ReportController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> products) {
-        return reportService.getSalesReport(startDate, endDate, categories, products);
+            @RequestParam(required = false) List<String> products,
+            @RequestParam(required = false) Long branchId) {
+        return reportService.getSalesReport(startDate, endDate, categories, products, branchId);
     }
 
     @GetMapping("/top-products")
     public List<TopProductDTO> getTopProducts(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return reportService.getTopSellingProducts(startDate, endDate);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) Long branchId) {
+        return reportService.getTopSellingProducts(startDate, endDate, branchId);
     }
 
     @GetMapping("/payment-stats")
     public List<PaymentMethodStatsDTO> getPaymentStats(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return reportService.getPaymentMethodStats(startDate, endDate);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) Long branchId) {
+        return reportService.getPaymentMethodStats(startDate, endDate, branchId);
     }
 
     @GetMapping("/sales/export/pdf")
     public ResponseEntity<InputStreamResource> exportToPdf(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) Long branchId) {
 
-        List<SalesReportDTO> sales = reportService.getSalesReport(startDate, endDate, null, null);
+        List<SalesReportDTO> sales = reportService.getSalesReport(startDate, endDate, null, null, branchId);
         ByteArrayInputStream bis = reportService.exportSalesToPdf(sales);
 
         HttpHeaders headers = new HttpHeaders();
@@ -68,9 +72,10 @@ public class ReportController {
     @GetMapping("/sales/export/excel")
     public ResponseEntity<InputStreamResource> exportToExcel(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) Long branchId) {
 
-        List<SalesReportDTO> sales = reportService.getSalesReport(startDate, endDate, null, null);
+        List<SalesReportDTO> sales = reportService.getSalesReport(startDate, endDate, null, null, branchId);
         ByteArrayInputStream bis = reportService.exportSalesToExcel(sales);
 
         HttpHeaders headers = new HttpHeaders();

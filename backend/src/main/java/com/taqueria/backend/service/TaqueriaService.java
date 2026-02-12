@@ -162,6 +162,13 @@ public class TaqueriaService {
         return orderRepository.findAll();
     }
 
+    public List<Order> getAllOrders(Long branchId) {
+        if (branchId != null) {
+            return orderRepository.findByBranchId(branchId);
+        }
+        return orderRepository.findAll();
+    }
+
     public Product saveProduct(Product product) {
         return productRepository.save(product);
     }
@@ -202,6 +209,14 @@ public class TaqueriaService {
     public List<Order> getKitchenOrders() {
         return orderRepository
                 .findByStatusIn(Arrays.asList(OrderStatus.OPEN, OrderStatus.PREPARING, OrderStatus.READY));
+    }
+
+    public List<Order> getKitchenOrders(Long branchId) {
+        List<OrderStatus> statuses = Arrays.asList(OrderStatus.OPEN, OrderStatus.PREPARING, OrderStatus.READY);
+        if (branchId != null) {
+            return orderRepository.findByStatusInAndBranchId(statuses, branchId);
+        }
+        return orderRepository.findByStatusIn(statuses);
     }
 
     public Order updateOrderStatus(Long id, OrderStatus status) {

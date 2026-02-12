@@ -39,10 +39,10 @@ class ReportServiceTest {
 
     @Test
     void testGetTopSellingProducts() {
-        when(orderRepository.findTopSellingProducts(any(LocalDateTime.class), any(LocalDateTime.class)))
+        when(orderRepository.findTopSellingProducts(any(LocalDateTime.class), any(LocalDateTime.class), any()))
                 .thenReturn(Collections.singletonList(new TopProductDTO("Taco", 10L, 100.0)));
 
-        List<TopProductDTO> result = reportService.getTopSellingProducts(LocalDate.now(), LocalDate.now());
+        List<TopProductDTO> result = reportService.getTopSellingProducts(LocalDate.now(), LocalDate.now(), null);
 
         assertNotNull(result);
         assertTrue(result.size() > 0);
@@ -50,10 +50,11 @@ class ReportServiceTest {
 
     @Test
     void testGetPaymentMethodStats() {
-        when(orderRepository.findPaymentMethodStats(any(LocalDateTime.class), any(LocalDateTime.class)))
+        when(orderRepository.findPaymentMethodStats(any(LocalDateTime.class), any(LocalDateTime.class), any()))
                 .thenReturn(Collections.singletonList(new PaymentMethodStatsDTO("CASH", 5L, 50.0)));
 
-        List<PaymentMethodStatsDTO> result = reportService.getPaymentMethodStats(LocalDate.now(), LocalDate.now());
+        List<PaymentMethodStatsDTO> result = reportService.getPaymentMethodStats(LocalDate.now(), LocalDate.now(),
+                null);
 
         assertNotNull(result);
         assertTrue(result.size() > 0);
@@ -77,7 +78,7 @@ class ReportServiceTest {
         when(orderRepository.findAll()).thenReturn(Collections.singletonList(order));
 
         List<SalesReportDTO> result = reportService.getSalesReport(LocalDate.now().minusDays(1),
-                LocalDate.now().plusDays(1), null, null);
+                LocalDate.now().plusDays(1), null, null, null);
 
         assertNotNull(result);
         assertTrue(result.size() > 0);

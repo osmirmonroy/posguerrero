@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TaqueriaService } from '../../services/taqueria.service';
+import { BranchService } from '../../services/branch.service';
 import { DashboardSummary, TopProduct, PaymentMethodStats } from '../../models/taqueria.models';
 
 @Component({
@@ -16,10 +17,21 @@ export class AdminDashboardComponent implements OnInit {
     paymentChart: any;
     chartOptions: any;
 
-    constructor(private taqueriaService: TaqueriaService) { }
+    constructor(
+        private taqueriaService: TaqueriaService,
+        private branchService: BranchService
+    ) { }
+
+    // I will fix the import later or use relative path if I knew it exactly. 
+    // Looking at previous views, it is in ../../services/branch.service.ts
+
+    // Let's re-view imports.
+
 
     ngOnInit(): void {
-        this.loadDashboardData();
+        this.branchService.selectedBranch$.subscribe(branchId => {
+            this.loadDashboardData(branchId || undefined);
+        });
         this.initChartOptions();
     }
 
@@ -43,20 +55,20 @@ export class AdminDashboardComponent implements OnInit {
         };
     }
 
-    loadDashboardData() {
-        this.taqueriaService.getDashboardSummary().subscribe(data => {
+    loadDashboardData(branchId?: number) {
+        this.taqueriaService.getDashboardSummary(branchId).subscribe(data => {
             this.summary = data;
         });
 
         const today = new Date().toISOString().split('T')[0];
         // Load Top Products for Today
-        this.taqueriaService.getTopProducts(today, today).subscribe(data => {
+        this.taqueriaService.getTopProducts(today, today, branchId).subscribe(data => {
             this.topProducts = data;
             this.updateProductsChart();
         });
 
         // Load Payment Stats for Today
-        this.taqueriaService.getPaymentStats(today, today).subscribe(data => {
+        this.taqueriaService.getPaymentStats(today, today, branchId).subscribe(data => {
             this.paymentStats = data;
             this.updatePaymentChart();
         });

@@ -20,10 +20,11 @@ public class ShiftController {
     private UserRepository userRepository;
 
     @PostMapping("/open")
-    public Shift openShift(@RequestBody java.util.Map<String, Double> payload, Principal principal) {
+    public Shift openShift(@RequestBody java.util.Map<String, Object> payload, Principal principal) {
         User user = userRepository.findByUsername(principal.getName()).orElseThrow();
-        Double initialCash = payload.get("initialCash");
-        return shiftService.openShift(user.getId(), initialCash);
+        Double initialCash = Double.valueOf(payload.get("initialCash").toString());
+        Long branchId = payload.get("branchId") != null ? Long.valueOf(payload.get("branchId").toString()) : null;
+        return shiftService.openShift(user.getId(), initialCash, branchId);
     }
 
     @PostMapping("/close")

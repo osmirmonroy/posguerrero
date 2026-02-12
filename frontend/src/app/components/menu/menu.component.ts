@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Product, Order, OrderItem, OrderStatus, Extra } from '../../models/taqueria.models';
 import { TaqueriaService } from '../../services/taqueria.service';
+import { BranchService } from '../../services/branch.service';
 import { MessageService } from 'primeng/api';
 
 @Component({
@@ -26,24 +27,32 @@ export class MenuComponent implements OnInit {
 
   constructor(
     private taqueriaService: TaqueriaService,
+    private branchService: BranchService,
     private messageService: MessageService
   ) { }
 
   ngOnInit(): void {
-    this.taqueriaService.getProducts().subscribe({
+    this.branchService.selectedBranch$.subscribe(branchId => {
+      this.loadProducts(branchId || undefined);
+    });
+
+    this.taqueriaService.getExtras().subscribe(data => {
+      this.extras = data;
+    });
+  }
+
+  loadProducts(branchId?: number) {
+    this.taqueriaService.getProducts(branchId).subscribe({
       next: (data) => {
         this.allProducts = data;
         this.products = [...this.allProducts];
         this.groupProducts();
+        this.loadCategories();
       },
       error: () => {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los productos' });
       }
     });
-    this.taqueriaService.getExtras().subscribe(data => {
-      this.extras = data;
-    });
-    this.loadCategories();
   }
 
   loadCategories() {
@@ -119,11 +128,14 @@ export class MenuComponent implements OnInit {
   }
 
   sendOrder() {
+    const selectedBranchId = this.branchService.getSelectedBranch();
+
     const order: Order = {
       id: this.currentOrder?.id,
       items: this.orderItems,
       status: this.currentOrder ? this.currentOrder.status : OrderStatus.OPEN,
-      customerName: this.customerName
+      customerName: this.customerName,
+      branch: selectedBranchId ? { id: selectedBranchId } : undefined
     };
 
     if (this.currentOrder && this.currentOrder.id) {

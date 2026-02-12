@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { AuthService } from './services/auth.service';
+import { BranchService, Branch } from './services/branch.service';
 
 @Component({
   selector: 'app-root',
@@ -10,13 +11,32 @@ import { AuthService } from './services/auth.service';
 export class AppComponent implements OnInit {
   items: MenuItem[] = [];
   currentUser: any;
+  branches: Branch[] = [];
+  selectedBranchId: number | null = null;
 
-  constructor(private authService: AuthService) { }
+  constructor(
+    private authService: AuthService,
+    private branchService: BranchService
+  ) { }
 
   ngOnInit() {
+    // Subscribe to selected branch changes
+    this.branchService.selectedBranch$.subscribe(branchId => {
+      this.selectedBranchId = branchId;
+    });
+
+    // Subscribe to current user changes
     this.authService.currentUser.subscribe(user => {
       this.currentUser = user;
       this.updateMenu(user);
+
+      // Load branches if user is ADMIN
+      if (user && user.role === 'ADMIN') {
+        this.loadBranches();
+      } else {
+        this.branches = [];
+        this.branchService.clearSelectedBranch();
+      }
     });
   }
 
@@ -98,7 +118,20 @@ export class AppComponent implements OnInit {
     this.items.push({
       label: 'Logout',
       icon: 'pi pi-fw pi-sign-out',
-      command: () => this.authService.logout()
+      command: () => {
+        this.branchService.clearSelectedBranch();
+        this.authService.logout();
+      }
     });
+  }
+
+  loadBranches() {
+    this.branchService.getAllBranches().subscribe(branches => {
+      this.branches = branches.filter(b => b.isActive);
+    });
+  }
+
+  onBranchChange() {
+    this.branchService.setSelectedBranch(this.selectedBranchId);
   }
 }

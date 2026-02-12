@@ -24,12 +24,19 @@ public class TaqueriaController {
     private com.taqueria.backend.repository.UserRepository userRepository;
 
     @GetMapping("/products")
-    public List<Product> getAllProducts(java.security.Principal principal) {
-        Long branchId = null;
+    public List<Product> getAllProducts(
+            @RequestParam(required = false) Long branchId,
+            java.security.Principal principal) {
         if (principal != null) {
             com.taqueria.backend.model.User user = userRepository.findByUsername(principal.getName()).orElse(null);
-            if (user != null && user.getBranch() != null) {
-                branchId = user.getBranch().getId();
+            if (user != null) {
+                if (user.getRole() == com.taqueria.backend.model.Role.ADMIN) {
+                    // Admins can see products for any branch if provided, or global if not
+                    return taqueriaService.getAllProducts(branchId);
+                } else if (user.getBranch() != null) {
+                    // Non-admins only see products for their branch
+                    return taqueriaService.getAllProducts(user.getBranch().getId());
+                }
             }
         }
         return taqueriaService.getAllProducts(branchId);
@@ -41,15 +48,21 @@ public class TaqueriaController {
             com.taqueria.backend.model.User user = userRepository.findByUsername(principal.getName()).orElse(null);
             order.setUser(user);
             if (user != null) {
-                order.setBranch(user.getBranch());
+                // If user is ADMIN and branch is provided in order, use it.
+                // Otherwise use user's assigned branch.
+                if (user.getRole() == com.taqueria.backend.model.Role.ADMIN && order.getBranch() != null) {
+                    // Keep the branch set by admin
+                } else {
+                    order.setBranch(user.getBranch());
+                }
             }
         }
         return taqueriaService.createOrder(order);
     }
 
     @GetMapping("/orders")
-    public List<Order> getAllOrders() {
-        return taqueriaService.getAllOrders();
+    public List<Order> getAllOrders(@RequestParam(required = false) Long branchId) {
+        return taqueriaService.getAllOrders(branchId);
     }
 
     @PutMapping("/orders/{id}")
@@ -119,8 +132,8 @@ public class TaqueriaController {
     }
 
     @GetMapping("/kitchen/orders")
-    public List<Order> getKitchenOrders() {
-        return taqueriaService.getKitchenOrders();
+    public List<Order> getKitchenOrders(@RequestParam(required = false) Long branchId) {
+        return taqueriaService.getKitchenOrders(branchId);
     }
 
     @PatchMapping("/orders/{id}/status")

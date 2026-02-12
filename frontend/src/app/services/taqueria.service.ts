@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product, Order, Extra, SalesReportDTO, Shift, Supplier, Supply, InventoryTransaction, TopProduct, PaymentMethodStats, DashboardSummary, OrderItem, Category } from '../models/taqueria.models';
+import { Branch } from '../models/Branch';
 import { environment } from '../../environments/environment';
 
 
@@ -23,8 +24,12 @@ export class TaqueriaService {
 
     constructor(private http: HttpClient) { }
 
-    getProducts(): Observable<Product[]> {
-        return this.http.get<Product[]>(`${this.apiUrl}/products`);
+    getProducts(branchId?: number): Observable<Product[]> {
+        let url = `${this.apiUrl}/products`;
+        if (branchId) {
+            url += `?branchId=${branchId}`;
+        }
+        return this.http.get<Product[]>(url);
     }
 
     // User Methods
@@ -53,8 +58,12 @@ export class TaqueriaService {
         return this.http.post<Order>(`${this.apiUrl}/orders`, order);
     }
 
-    getOrders(): Observable<Order[]> {
-        return this.http.get<Order[]>(`${this.apiUrl}/orders`);
+    getOrders(branchId?: number): Observable<Order[]> {
+        let url = `${this.apiUrl}/orders`;
+        if (branchId) {
+            url += `?branchId=${branchId}`;
+        }
+        return this.http.get<Order[]>(url);
     }
 
     updateOrder(id: number, order: Order): Observable<Order> {
@@ -101,8 +110,12 @@ export class TaqueriaService {
         }
     }
 
-    getKitchenOrders(): Observable<Order[]> {
-        return this.http.get<Order[]>(`${this.apiUrl}/kitchen/orders`);
+    getKitchenOrders(branchId?: number): Observable<Order[]> {
+        let url = `${this.apiUrl}/kitchen/orders`;
+        if (branchId) {
+            url += `?branchId=${branchId}`;
+        }
+        return this.http.get<Order[]>(url);
     }
 
     updateOrderStatus(id: number, status: string): Observable<Order> {
@@ -118,8 +131,8 @@ export class TaqueriaService {
     }
 
     // Shift Methods
-    openShift(initialCash: number): Observable<Shift> {
-        return this.http.post<Shift>(`${this.apiUrl}/shifts/open`, { initialCash });
+    openShift(initialCash: number, branchId?: number): Observable<Shift> {
+        return this.http.post<Shift>(`${this.apiUrl}/shifts/open`, { initialCash, branchId });
     }
 
     closeShift(finalCashDeclared: number, comments: string): Observable<Shift> {
@@ -153,8 +166,10 @@ export class TaqueriaService {
     }
 
     // Supplies
-    getSupplies(): Observable<Supply[]> {
-        return this.http.get<Supply[]>(`${this.apiUrl}/inventory/supplies`);
+    getSupplies(branchId?: number): Observable<Supply[]> {
+        let params: any = {};
+        if (branchId) params.branchId = branchId;
+        return this.http.get<Supply[]>(`${this.apiUrl}/inventory/supplies`, { params });
     }
 
     saveSupply(supply: Supply): Observable<Supply> {
@@ -182,45 +197,52 @@ export class TaqueriaService {
         return this.http.get<Supply[]>(`${this.apiUrl}/inventory/alerts`);
     }
 
-    getSalesReport(startDate?: string, endDate?: string, categories?: string[], products?: string[]): Observable<SalesReportDTO[]> {
+    getSalesReport(startDate?: string, endDate?: string, categories?: string[], products?: string[], branchId?: number): Observable<SalesReportDTO[]> {
         let params: any = {};
         if (startDate) params.startDate = startDate;
         if (endDate) params.endDate = endDate;
         if (categories) params.categories = categories.join(',');
         if (products) params.products = products.join(',');
+        if (branchId) params.branchId = branchId;
         return this.http.get<SalesReportDTO[]>(`${this.apiUrl}/reports/sales`, { params });
     }
 
-    getTopProducts(startDate?: string, endDate?: string): Observable<TopProduct[]> {
+    getTopProducts(startDate?: string, endDate?: string, branchId?: number): Observable<TopProduct[]> {
         let params: any = {};
         if (startDate) params.startDate = startDate;
         if (endDate) params.endDate = endDate;
+        if (branchId) params.branchId = branchId;
         return this.http.get<TopProduct[]>(`${this.apiUrl}/reports/top-products`, { params });
     }
 
-    getPaymentStats(startDate?: string, endDate?: string): Observable<PaymentMethodStats[]> {
+    getPaymentStats(startDate?: string, endDate?: string, branchId?: number): Observable<PaymentMethodStats[]> {
         let params: any = {};
         if (startDate) params.startDate = startDate;
         if (endDate) params.endDate = endDate;
+        if (branchId) params.branchId = branchId;
         return this.http.get<PaymentMethodStats[]>(`${this.apiUrl}/reports/payment-stats`, { params });
     }
 
-    exportPdf(startDate?: string, endDate?: string): Observable<Blob> {
+    exportPdf(startDate?: string, endDate?: string, branchId?: number): Observable<Blob> {
         let params: any = {};
         if (startDate) params.startDate = startDate;
         if (endDate) params.endDate = endDate;
+        if (branchId) params.branchId = branchId;
         return this.http.get(`${this.apiUrl}/reports/sales/export/pdf`, { params, responseType: 'blob' });
     }
 
-    exportExcel(startDate?: string, endDate?: string): Observable<Blob> {
+    exportExcel(startDate?: string, endDate?: string, branchId?: number): Observable<Blob> {
         let params: any = {};
         if (startDate) params.startDate = startDate;
         if (endDate) params.endDate = endDate;
+        if (branchId) params.branchId = branchId;
         return this.http.get(`${this.apiUrl}/reports/sales/export/excel`, { params, responseType: 'blob' });
     }
 
-    getDashboardSummary(): Observable<DashboardSummary> {
-        return this.http.get<DashboardSummary>(`${this.apiUrl}/dashboard/summary`);
+    getDashboardSummary(branchId?: number): Observable<DashboardSummary> {
+        let params: any = {};
+        if (branchId) params.branchId = branchId;
+        return this.http.get<DashboardSummary>(`${this.apiUrl}/dashboard/summary`, { params });
     }
 
     // Category Methods
@@ -238,5 +260,10 @@ export class TaqueriaService {
 
     deleteCategory(id: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/categories/${id}`);
+    }
+
+    // Branch Methods
+    getBranches(): Observable<Branch[]> {
+        return this.http.get<Branch[]>(`${this.apiUrl}/branches`);
     }
 }

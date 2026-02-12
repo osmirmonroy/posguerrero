@@ -38,7 +38,7 @@ public class ReportService {
         private OrderRepository orderRepository;
 
         public List<SalesReportDTO> getSalesReport(LocalDate startDate, LocalDate endDate, List<String> categories,
-                        List<String> products) {
+                        List<String> products, Long branchId) {
                 // ... (Keep existing implementation logic but reuse filter)
                 // For efficiency, better to use JPQL, but keeping existing Java stream logic if
                 // acceptable for MVP
@@ -48,7 +48,12 @@ public class ReportService {
                 // I will re-implement the existing getSalesReport based on previous `view_file`
                 // content.
 
-                List<Order> orders = orderRepository.findAll();
+                List<Order> orders;
+                if (branchId != null) {
+                        orders = orderRepository.findByBranchId(branchId);
+                } else {
+                        orders = orderRepository.findAll();
+                }
 
                 if (startDate != null) {
                         orders = orders.stream()
@@ -113,16 +118,17 @@ public class ReportService {
         }
 
         // NEW METHODS
-        public List<TopProductDTO> getTopSellingProducts(LocalDate startDate, LocalDate endDate) {
+        public List<TopProductDTO> getTopSellingProducts(LocalDate startDate, LocalDate endDate, Long branchId) {
                 LocalDateTime start = startDate != null ? startDate.atStartOfDay() : LocalDateTime.MIN;
                 LocalDateTime end = endDate != null ? endDate.atTime(23, 59, 59) : LocalDateTime.MAX;
-                return orderRepository.findTopSellingProducts(start, end);
+                return orderRepository.findTopSellingProducts(start, end, branchId);
         }
 
-        public List<PaymentMethodStatsDTO> getPaymentMethodStats(LocalDate startDate, LocalDate endDate) {
+        public List<PaymentMethodStatsDTO> getPaymentMethodStats(LocalDate startDate, LocalDate endDate,
+                        Long branchId) {
                 LocalDateTime start = startDate != null ? startDate.atStartOfDay() : LocalDateTime.MIN;
                 LocalDateTime end = endDate != null ? endDate.atTime(23, 59, 59) : LocalDateTime.MAX;
-                return orderRepository.findPaymentMethodStats(start, end);
+                return orderRepository.findPaymentMethodStats(start, end, branchId);
         }
 
         // PDF Export

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TaqueriaService } from '../../services/taqueria.service';
+import { BranchService } from '../../services/branch.service';
 import { Order } from '../../models/taqueria.models';
 
 @Component({
@@ -12,10 +13,19 @@ export class OrderListComponent implements OnInit {
   selectedOrder: Order | null = null;
   dialogVisible: boolean = false;
 
-  constructor(private taqueriaService: TaqueriaService) { }
+  constructor(
+    private taqueriaService: TaqueriaService,
+    private branchService: BranchService
+  ) { }
 
   ngOnInit(): void {
-    this.taqueriaService.getOrders().subscribe(data => {
+    this.branchService.selectedBranch$.subscribe(branchId => {
+      this.loadOrders(branchId || undefined);
+    });
+  }
+
+  loadOrders(branchId?: number) {
+    this.taqueriaService.getOrders(branchId).subscribe(data => {
       this.orders = data;
     });
   }

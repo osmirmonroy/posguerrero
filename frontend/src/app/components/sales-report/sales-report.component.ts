@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TaqueriaService } from '../../services/taqueria.service';
 import { SalesReportDTO, Product, TopProduct, PaymentMethodStats } from '../../models/taqueria.models';
+import { BranchService } from '../../services/branch.service';
 
 @Component({
     selector: 'app-sales-report',
@@ -32,11 +33,16 @@ export class SalesReportComponent implements OnInit {
 
     products: any[] = [];
 
-    constructor(private taqueriaService: TaqueriaService) { }
+    constructor(
+        private taqueriaService: TaqueriaService,
+        private branchService: BranchService
+    ) { }
 
     ngOnInit(): void {
+        this.branchService.selectedBranch$.subscribe(branchId => {
+            this.generateReport();
+        });
         this.loadProducts();
-        this.generateReport();
         this.initChartOptions();
     }
 
@@ -70,21 +76,23 @@ export class SalesReportComponent implements OnInit {
         const start = this.startDate ? this.startDate.toISOString().split('T')[0] : undefined;
         const end = this.endDate ? this.endDate.toISOString().split('T')[0] : undefined;
 
+        const branchId = this.branchService.getSelectedBranch();
+
         // General Sales
-        this.taqueriaService.getSalesReport(start, end, this.selectedCategories, this.selectedProducts)
+        this.taqueriaService.getSalesReport(start, end, this.selectedCategories, this.selectedProducts, branchId || undefined)
             .subscribe(data => {
                 this.reportData = data;
                 this.updateSalesChart();
             });
 
         // Top Products
-        this.taqueriaService.getTopProducts(start, end).subscribe(data => {
+        this.taqueriaService.getTopProducts(start, end, branchId || undefined).subscribe(data => {
             this.topProducts = data;
             this.updateTopProductsChart();
         });
 
         // Payment Stats
-        this.taqueriaService.getPaymentStats(start, end).subscribe(data => {
+        this.taqueriaService.getPaymentStats(start, end, branchId || undefined).subscribe(data => {
             this.paymentStats = data;
             this.updatePaymentChart();
         });
@@ -141,7 +149,8 @@ export class SalesReportComponent implements OnInit {
     exportPdf() {
         const start = this.startDate ? this.startDate.toISOString().split('T')[0] : undefined;
         const end = this.endDate ? this.endDate.toISOString().split('T')[0] : undefined;
-        this.taqueriaService.exportPdf(start, end).subscribe(blob => {
+        const branchId = this.branchService.getSelectedBranch();
+        this.taqueriaService.exportPdf(start, end, branchId || undefined).subscribe(blob => {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -153,7 +162,8 @@ export class SalesReportComponent implements OnInit {
     exportExcel() {
         const start = this.startDate ? this.startDate.toISOString().split('T')[0] : undefined;
         const end = this.endDate ? this.endDate.toISOString().split('T')[0] : undefined;
-        this.taqueriaService.exportExcel(start, end).subscribe(blob => {
+        const branchId = this.branchService.getSelectedBranch();
+        this.taqueriaService.exportExcel(start, end, branchId || undefined).subscribe(blob => {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;

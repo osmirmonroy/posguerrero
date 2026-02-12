@@ -38,6 +38,7 @@ export interface Order {
     date?: string;
     total?: number;
     items: OrderItem[];
+    branch?: { id: number, name?: string };
     // user?: User; // Avoid cyclic dependency if possible, or define User interface
 }
 

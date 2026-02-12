@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TaqueriaService } from '../../services/taqueria.service';
+import { BranchService } from '../../services/branch.service';
 import { Shift } from '../../models/taqueria.models';
 
 @Component({
@@ -19,7 +20,10 @@ export class ShiftControlComponent implements OnInit {
   finalCashDeclared: number = 0;
   comments: string = '';
 
-  constructor(private taqueriaService: TaqueriaService) { }
+  constructor(
+    private taqueriaService: TaqueriaService,
+    private branchService: BranchService
+  ) { }
 
   ngOnInit(): void {
     this.loadCurrentShift();
@@ -43,7 +47,8 @@ export class ShiftControlComponent implements OnInit {
   onOpenShift(): void {
     if (this.initialCash < 0) return;
     this.loading = true;
-    this.taqueriaService.openShift(this.initialCash).subscribe({
+    const branchId = this.branchService.getSelectedBranch();
+    this.taqueriaService.openShift(this.initialCash, branchId || undefined).subscribe({
       next: (shift) => {
         this.currentShift = shift;
         this.loading = false;

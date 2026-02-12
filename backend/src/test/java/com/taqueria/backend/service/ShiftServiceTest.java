@@ -44,7 +44,7 @@ class ShiftServiceTest {
         when(shiftRepository.findByUserAndStatus(user, "OPEN")).thenReturn(Optional.empty());
         when(shiftRepository.save(any(Shift.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Shift shift = shiftService.openShift(1, 100.0);
+        Shift shift = shiftService.openShift(1, 100.0, null);
 
         assertNotNull(shift);
         assertEquals(100.0, shift.getInitialCash());

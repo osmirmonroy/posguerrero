@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { TaqueriaService } from '../../services/taqueria.service';
 import { WebSocketService } from '../../services/web-socket.service';
+import { BranchService } from '../../services/branch.service';
 import { Order, OrderStatus } from '../../models/taqueria.models';
 import { Subscription, interval } from 'rxjs';
 
@@ -20,11 +21,14 @@ export class KitchenDashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private taqueriaService: TaqueriaService,
+    private branchService: BranchService,
     private webSocketService: WebSocketService
   ) { }
 
   ngOnInit(): void {
-    this.loadOrders();
+    this.branchService.selectedBranch$.subscribe(branchId => {
+      this.loadOrders(branchId || undefined);
+    });
     this.setupWebSocket();
 
     // Update elapsed times every minute (or second if we want seconds precision)
@@ -42,8 +46,8 @@ export class KitchenDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadOrders(): void {
-    this.taqueriaService.getKitchenOrders().subscribe(orders => {
+  loadOrders(branchId?: number): void {
+    this.taqueriaService.getKitchenOrders(branchId).subscribe(orders => {
       this.orders = orders;
       this.categorizeOrders();
     });
@@ -58,6 +62,12 @@ export class KitchenDashboardComponent implements OnInit, OnDestroy {
   }
 
   handleOrderUpdate(updatedOrder: Order): void {
+    // Filter by selected branch if set
+    const selectedBranchId = this.branchService.getSelectedBranch();
+    if (selectedBranchId && updatedOrder.branch && updatedOrder.branch.id !== selectedBranchId) {
+      return;
+    }
+
     const index = this.orders.findIndex(o => o.id === updatedOrder.id);
     if (index !== -1) {
       if (updatedOrder.status === OrderStatus.DELIVERED || updatedOrder.status === OrderStatus.PAID) {

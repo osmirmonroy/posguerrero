@@ -45,8 +45,8 @@ public class InventoryController {
 
     // Supplies
     @GetMapping("/supplies")
-    public List<Supply> getAllSupplies() {
-        return inventoryService.getAllSupplies();
+    public List<Supply> getAllSupplies(@RequestParam(required = false) Long branchId) {
+        return inventoryService.getAllSupplies(branchId);
     }
 
     @PostMapping("/supplies")
@@ -85,8 +85,10 @@ public class InventoryController {
 
     // Alerts
     @GetMapping("/alerts")
-    public List<com.taqueria.backend.model.BranchSupply> getLowStockAlerts(Principal principal) {
+    public List<com.taqueria.backend.model.BranchSupply> getLowStockAlerts(
+            @RequestParam(required = false) Long branchId,
+            Principal principal) {
         User user = userRepository.findByUsername(principal.getName()).orElseThrow();
-        return inventoryService.getLowStockSupplies(user.getId());
+        return inventoryService.getLowStockSupplies(user.getId(), branchId);
     }
 }

@@ -47,8 +47,26 @@ public class InventoryService {
     }
 
     // Supply CRUD
-    public List<Supply> getAllSupplies() {
-        return supplyRepository.findAll();
+    public List<Supply> getAllSupplies(Long branchId) {
+        List<Supply> supplies = supplyRepository.findAll();
+        if (branchId != null) {
+            com.taqueria.backend.model.Branch branch = new com.taqueria.backend.model.Branch();
+            branch.setId(branchId);
+            java.util.Map<Long, com.taqueria.backend.model.BranchSupply> branchSupplies = branchSupplyRepository
+                    .findByBranch(branch).stream()
+                    .collect(java.util.stream.Collectors.toMap(bs -> bs.getSupply().getId(), bs -> bs));
+
+            for (Supply s : supplies) {
+                if (branchSupplies.containsKey(s.getId())) {
+                    com.taqueria.backend.model.BranchSupply bs = branchSupplies.get(s.getId());
+                    s.setStock(bs.getStock());
+                    s.setMinStock(bs.getMinStock());
+                } else {
+                    s.setStock(0.0);
+                }
+            }
+        }
+        return supplies;
     }
 
     public Supply saveSupply(Supply supply) {
@@ -94,12 +112,7 @@ public class InventoryService {
         // Record Transaction
         InventoryTransaction transaction = new InventoryTransaction();
         transaction.setSupply(supply);
-        // We really should add branch_id to transaction too, but for now linking via
-        // user is implicit
-        // or we need to add branch to transaction entity as planned.
-        // Plan said: "inventory_transactions: Agregar branch_id".
-        // I haven't added it to Entity yet. I should.
-
+        transaction.setBranch(user.getBranch());
         transaction.setType(type);
         transaction.setQuantity(quantity);
         transaction.setReason(reason);
@@ -114,7 +127,15 @@ public class InventoryService {
     }
 
     // Alerts
-    public List<com.taqueria.backend.model.BranchSupply> getLowStockSupplies(Integer userId) {
+    public List<com.taqueria.backend.model.BranchSupply> getLowStockSupplies(Integer userId, Long branchId) {
+        if (branchId != null) {
+            com.taqueria.backend.model.Branch branch = new com.taqueria.backend.model.Branch();
+            branch.setId(branchId);
+            return branchSupplyRepository.findByBranch(branch).stream()
+                    .filter(bs -> bs.getMinStock() != null && bs.getStock() <= bs.getMinStock())
+                    .toList();
+        }
+
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         if (user.getBranch() == null)
             return List.of();

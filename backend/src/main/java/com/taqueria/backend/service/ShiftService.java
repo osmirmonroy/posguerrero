@@ -28,7 +28,7 @@ public class ShiftService {
     @Autowired
     private UserRepository userRepository;
 
-    public Shift openShift(Integer userId, Double initialCash) {
+    public Shift openShift(Integer userId, Double initialCash, Long branchId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         Optional<Shift> existingShift = shiftRepository.findByUserAndStatus(user, "OPEN");
@@ -38,7 +38,15 @@ public class ShiftService {
 
         Shift shift = new Shift();
         shift.setUser(user);
-        shift.setBranch(user.getBranch()); // Set branch from user
+
+        if (branchId != null) {
+            com.taqueria.backend.model.Branch branch = new com.taqueria.backend.model.Branch();
+            branch.setId(branchId);
+            shift.setBranch(branch);
+        } else {
+            shift.setBranch(user.getBranch()); // Set branch from user
+        }
+
         shift.setStartTime(LocalDateTime.now());
         shift.setInitialCash(initialCash);
         shift.setStatus("OPEN");
