@@ -2,9 +2,9 @@
     <div class="flex justify-content-between align-items-center mb-4">
         <h2>Reportes Avanzados</h2>
         <div class="flex gap-2">
-            <button pButton label="Export PDF" icon="pi pi-file-pdf" class="p-button-danger"
+            <button pButton label="Exportar PDF" icon="pi pi-file-pdf" class="p-button-danger"
                 (click)="exportPdf()"></button>
-            <button pButton label="Export Excel" icon="pi pi-file-excel" class="p-button-success"
+            <button pButton label="Exportar Excel" icon="pi pi-file-excel" class="p-button-success"
                 (click)="exportExcel()"></button>
         </div>
     </div>
@@ -25,7 +25,7 @@
     </div>
 
     <p-tabView>
-        <p-tabPanel header="General Sales">
+        <p-tabPanel header="Ventas Generales">
             <div class="grid">
                 <div class="col-12 md:col-6">
                     <p-chart type="bar" [data]="chartData" [options]="chartOptions" *ngIf="chartData"></p-chart>
@@ -34,9 +34,9 @@
                     <p-table [value]="reportData" [paginator]="true" [rows]="5" styleClass="p-datatable-sm">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th>Date</th>
-                                <th>Category</th>
-                                <th>Qty</th>
+                                <th>Fecha</th>
+                                <th>Categoría</th>
+                                <th>Cant.</th>
                                 <th>Total</th>
                             </tr>
                         </ng-template>
@@ -45,7 +45,7 @@
                                 <td>{{r.date}}</td>
                                 <td>{{r.category}}</td>
                                 <td>{{r.quantity}}</td>
-                                <td>{{r.totalSales | currency}}</td>
+                                <td>{{r.totalSales | currency:'MXN':'symbol':'1.2-2':'es-MX'}}</td>
                             </tr>
                         </ng-template>
                     </p-table>
@@ -53,7 +53,7 @@
             </div>
         </p-tabPanel>
 
-        <p-tabPanel header="Top Products">
+        <p-tabPanel header="Top Productos">
             <div class="grid">
                 <div class="col-12 md:col-6">
                     <p-chart type="bar" [data]="topProductsChart" [options]="chartOptions"
@@ -63,16 +63,16 @@
                     <p-table [value]="topProducts" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th>Product</th>
-                                <th>Qty Sold</th>
-                                <th>Total Revenue</th>
+                                <th>Producto</th>
+                                <th>Cant. Vendida</th>
+                                <th>Ingresos Totales</th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-p>
                             <tr>
                                 <td>{{p.productName}}</td>
                                 <td>{{p.quantity}}</td>
-                                <td>{{p.total | currency}}</td>
+                                <td>{{p.total | currency:'MXN':'symbol':'1.2-2':'es-MX'}}</td>
                             </tr>
                         </ng-template>
                     </p-table>
@@ -80,7 +80,7 @@
             </div>
         </p-tabPanel>
 
-        <p-tabPanel header="Payment Methods">
+        <p-tabPanel header="Métodos de Pago">
             <div class="grid">
                 <div class="col-12 md:col-6">
                     <p-chart type="pie" [data]="paymentChart" *ngIf="paymentChart"></p-chart>
@@ -89,8 +89,8 @@
                     <p-table [value]="paymentStats" styleClass="p-datatable-sm">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th>Method</th>
-                                <th>Count</th>
+                                <th>Método</th>
+                                <th>Cantidad</th>
                                 <th>Total</th>
                             </tr>
                         </ng-template>
@@ -98,7 +98,7 @@
                             <tr>
                                 <td>{{p.paymentMethod}}</td>
                                 <td>{{p.count}}</td>
-                                <td>{{p.total | currency}}</td>
+                                <td>{{p.total | currency:'MXN':'symbol':'1.2-2':'es-MX'}}</td>
                             </tr>
                         </ng-template>
                     </p-table>

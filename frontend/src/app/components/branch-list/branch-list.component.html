@@ -28,9 +28,9 @@
                 </td>
                 <td>
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
-                        (click)="editBranch(branch)"></button>
+                        (click)="editBranch(branch)" pTooltip="Editar"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
-                        (click)="deleteBranch(branch)"></button>
+                        (click)="deleteBranch(branch)" pTooltip="Eliminar"></button>
                 </td>
             </tr>
         </ng-template>
@@ -67,5 +67,5 @@
     </ng-template>
 </p-dialog>
 
-<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+<p-confirmDialog [style]="{width: '450px'}" acceptLabel="Sí" rejectLabel="No"></p-confirmDialog>
 <p-toast></p-toast>

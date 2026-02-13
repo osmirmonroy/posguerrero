@@ -47,9 +47,16 @@ export class KitchenDashboardComponent implements OnInit, OnDestroy {
   }
 
   loadOrders(branchId?: number): void {
-    this.taqueriaService.getKitchenOrders(branchId).subscribe(orders => {
-      this.orders = orders;
-      this.categorizeOrders();
+    console.log('KitchenDashboard: Loading orders for branch:', branchId);
+    this.taqueriaService.getKitchenOrders(branchId).subscribe({
+      next: (orders) => {
+        console.log('KitchenDashboard: Orders received:', orders.length);
+        this.orders = orders;
+        this.categorizeOrders();
+      },
+      error: (err) => {
+        console.error('KitchenDashboard: Error loading orders:', err);
+      }
     });
   }
 
@@ -130,7 +137,7 @@ export class KitchenDashboardComponent implements OnInit, OnDestroy {
           }
           this.categorizeOrders();
         },
-        error: (err) => console.error('Failed to update item status', err)
+        error: (err) => console.error('Error al actualizar el estado del item', err)
       });
     }
   }

@@ -46,7 +46,7 @@ public class DashboardController {
                 // filtering.
                 // But for Low Stock, we MUST pass userId.
 
-                Double dailySales = orderRepository.findAll().stream()
+                Double dailySales = orderRepository.findAllByIsActiveTrue().stream()
                                 .filter(o -> o.getStatus() == OrderStatus.PAID &&
                                                 o.getDate() != null &&
                                                 !o.getDate().isBefore(startOfDay) &&
@@ -57,7 +57,7 @@ public class DashboardController {
                                 .sum();
 
                 // 2. Active Orders Count (OPEN, PREPARING, READY, REOPENED)
-                Long activeOrders = orderRepository.findByStatusIn(Arrays.asList(
+                Long activeOrders = orderRepository.findByStatusInAndIsActiveTrue(Arrays.asList(
                                 OrderStatus.OPEN, OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.REOPENED))
                                 .stream()
                                 .filter(o -> branchId == null

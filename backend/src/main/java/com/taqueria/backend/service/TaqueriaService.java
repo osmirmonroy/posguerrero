@@ -4,7 +4,6 @@ import com.taqueria.backend.model.Order;
 import com.taqueria.backend.model.OrderStatus;
 import com.taqueria.backend.model.Product;
 import com.taqueria.backend.model.Extra;
-import com.taqueria.backend.model.Branch;
 import com.taqueria.backend.model.OrderItem;
 import com.taqueria.backend.repository.ExtraRepository;
 import com.taqueria.backend.repository.OrderRepository;
@@ -69,18 +68,29 @@ public class TaqueriaService {
         return products;
     }
 
-    public Order createOrder(Order order) {
+    public Order createOrder(Order order, com.taqueria.backend.model.User user) {
         order.setDate(LocalDateTime.now());
         if (order.getStatus() == null) {
             order.setStatus(OrderStatus.OPEN);
         }
+        order.setActive(true);
+        order.setCreatedBy(user);
+        order.setModifiedBy(user);
+
+        // Ensure branch is assigned
+        if (order.getBranch() == null && user != null && user.getBranch() != null) {
+            order.setBranch(user.getBranch());
+        }
+
+        if (order.getBranch() == null) {
+            throw new RuntimeException("El pedido debe estar asignado a una sucursal.");
+        }
+
         // Calculate total if not provided or verify it
         double total = 0;
         if (order.getItems() != null) {
             for (var item : order.getItems()) {
                 item.setOrder(order);
-                // In a real app, we should fetch product price from DB to avoid client-side
-                // manipulation
                 // Now fetching branch aware price if branch is set on order
                 Product p = productRepository.findById(item.getProduct().getId()).orElse(null);
                 if (p != null) {
@@ -111,16 +121,16 @@ public class TaqueriaService {
         return orderRepository.save(order);
     }
 
-    public Order updateOrder(Long id, Order orderDetails) {
+    public Order updateOrder(Long id, Order orderDetails, com.taqueria.backend.model.User user) {
         Order order = orderRepository.findById(id).orElse(null);
         if (order != null) {
+            order.setModifiedBy(user);
             if (orderDetails.getStatus() != null) {
                 order.setStatus(orderDetails.getStatus());
             }
-            if (orderDetails.getItems() != null && !orderDetails.getItems().isEmpty()) {
-                // Logic to append items could be complex (merging), for simplicity we just add
-                // new ones
-                // In a real app, we might want to merge quantities if product exists
+            if (orderDetails.getItems() != null) {
+                // Clear and replace items if new list provided
+                order.getItems().clear();
                 for (var item : orderDetails.getItems()) {
                     item.setOrder(order);
                     order.getItems().add(item);
@@ -131,6 +141,13 @@ public class TaqueriaService {
                     Product p = productRepository.findById(item.getProduct().getId()).orElse(null);
                     if (p != null) {
                         double itemPrice = p.getPrice();
+                        // Handle branch price if applicable
+                        if (order.getBranch() != null) {
+                            var bp = branchProductRepository.findByBranchIdAndProductId(order.getBranch().getId(),
+                                    p.getId());
+                            if (bp.isPresent())
+                                itemPrice = bp.get().getPrice();
+                        }
                         if (item.getExtras() != null) {
                             for (var extra : item.getExtras()) {
                                 Extra e = extraRepository.findById(extra.getId()).orElse(null);
@@ -151,22 +168,33 @@ public class TaqueriaService {
         return null;
     }
 
+    public void deleteOrder(Long id, String reason, com.taqueria.backend.model.User user) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+        order.setActive(false);
+        order.setDeletionReason(reason);
+        order.setDeletedBy(user);
+        order.setDeletionDate(LocalDateTime.now());
+        orderRepository.save(order);
+        messagingTemplate.convertAndSend("/topic/orders", order);
+    }
+
     public List<Order> getOrdersByTable(Integer tableNumber) {
-        // This requires a custom query in Repository, or filtering here.
-        // For simplicity/performance, let's filter here or add method to repo.
-        // Let's add method to repo in next step.
-        return orderRepository.findByTableNumberAndStatus(tableNumber, OrderStatus.OPEN);
+        return orderRepository.findByTableNumberAndStatusAndIsActiveTrue(tableNumber, OrderStatus.OPEN);
     }
 
     public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+        return orderRepository.findAllByIsActiveTrue();
+    }
+
+    public Order getOrder(Long id) {
+        return orderRepository.findById(id).orElse(null);
     }
 
     public List<Order> getAllOrders(Long branchId) {
         if (branchId != null) {
-            return orderRepository.findByBranchId(branchId);
+            return orderRepository.findByBranchIdAndIsActiveTrue(branchId);
         }
-        return orderRepository.findAll();
+        return orderRepository.findAllByIsActiveTrue();
     }
 
     public Product saveProduct(Product product) {
@@ -208,21 +236,23 @@ public class TaqueriaService {
 
     public List<Order> getKitchenOrders() {
         return orderRepository
-                .findByStatusIn(Arrays.asList(OrderStatus.OPEN, OrderStatus.PREPARING, OrderStatus.READY));
+                .findByStatusInAndIsActiveTrue(
+                        Arrays.asList(OrderStatus.OPEN, OrderStatus.PREPARING, OrderStatus.READY));
     }
 
     public List<Order> getKitchenOrders(Long branchId) {
         List<OrderStatus> statuses = Arrays.asList(OrderStatus.OPEN, OrderStatus.PREPARING, OrderStatus.READY);
         if (branchId != null) {
-            return orderRepository.findByStatusInAndBranchId(statuses, branchId);
+            return orderRepository.findByStatusInAndBranchIdAndIsActiveTrue(statuses, branchId);
         }
-        return orderRepository.findByStatusIn(statuses);
+        return orderRepository.findByStatusInAndIsActiveTrue(statuses);
     }
 
-    public Order updateOrderStatus(Long id, OrderStatus status) {
+    public Order updateOrderStatus(Long id, OrderStatus status, com.taqueria.backend.model.User user) {
         Order order = orderRepository.findById(id).orElse(null);
         if (order != null) {
             order.setStatus(status);
+            order.setModifiedBy(user);
             Order updatedOrder = orderRepository.save(order);
             // Notify kitchen/cashier
             messagingTemplate.convertAndSend("/topic/orders", updatedOrder);
@@ -258,14 +288,20 @@ public class TaqueriaService {
                 .collect(java.util.stream.Collectors.toMap(bp -> bp.getBranch().getId(), bp -> bp.getPrice()));
     }
 
-    public OrderItem updateOrderItemStatus(Long itemId, OrderStatus status) {
+    public OrderItem updateOrderItemStatus(Long itemId, OrderStatus status, com.taqueria.backend.model.User user) {
         OrderItem item = orderItemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
         item.setStatus(status);
+
+        Order order = item.getOrder();
+        if (order != null) {
+            order.setModifiedBy(user);
+            orderRepository.save(order);
+        }
+
         OrderItem savedItem = orderItemRepository.save(item);
 
         // Notify via WebSocket about the order update (we send the whole order for
         // simplicity)
-        Order order = savedItem.getOrder();
         messagingTemplate.convertAndSend("/topic/orders", order);
 
         return savedItem;

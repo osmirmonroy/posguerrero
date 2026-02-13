@@ -9,7 +9,7 @@
     </p-toolbar>
 
     <p-table [value]="extras" [rows]="10" [paginator]="true" [tableStyle]="{'min-width': '75rem'}" [rowHover]="true"
-        dataKey="id" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        dataKey="id" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
         [showCurrentPageReport]="true">
         <ng-template pTemplate="caption">
             <div class="flex align-items-center justify-content-between">
@@ -26,12 +26,12 @@
         <ng-template pTemplate="body" let-extra>
             <tr>
                 <td>{{extra.name}}</td>
-                <td>{{extra.price | currency:'USD'}}</td>
+                <td>{{extra.price | currency:'MXN':'symbol':'1.2-2':'es-MX'}}</td>
                 <td>
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
-                        (click)="editExtra(extra)"></button>
+                        (click)="editExtra(extra)" pTooltip="Editar"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
-                        (click)="deleteExtra(extra)"></button>
+                        (click)="deleteExtra(extra)" pTooltip="Eliminar"></button>
                 </td>
             </tr>
         </ng-template>
@@ -53,8 +53,8 @@
         </div>
         <div class="field">
             <label for="price">Precio</label>
-            <p-inputNumber id="price" [(ngModel)]="extra.price" mode="currency" currency="USD"
-                locale="en-US"></p-inputNumber>
+            <p-inputNumber id="price" [(ngModel)]="extra.price" mode="currency" currency="MXN"
+                locale="es-MX"></p-inputNumber>
         </div>
     </ng-template>
 
@@ -65,4 +65,4 @@
     </ng-template>
 </p-dialog>
 
-<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+<p-confirmDialog [style]="{width: '450px'}" acceptLabel="Sí" rejectLabel="No"></p-confirmDialog>

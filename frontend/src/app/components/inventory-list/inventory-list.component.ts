@@ -71,14 +71,14 @@ export class InventoryListComponent implements OnInit {
 
   deleteSupply(supply: Supply) {
     this.confirmationService.confirm({
-      message: 'Are you sure you want to delete ' + supply.name + '?',
-      header: 'Confirm',
+      message: '¿Está seguro de que desea eliminar ' + supply.name + '?',
+      header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         if (supply.id) {
           this.taqueriaService.deleteSupply(supply.id).subscribe(() => {
             this.loadSupplies();
-            this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Supply Deleted', life: 3000 });
+            this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: 'Insumo Eliminado', life: 3000 });
           });
         }
       }
@@ -96,7 +96,7 @@ export class InventoryListComponent implements OnInit {
     if (this.supply.name.trim()) {
       this.taqueriaService.saveSupply(this.supply).subscribe(() => {
         this.loadSupplies();
-        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Supply Saved', life: 3000 });
+        this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: 'Insumo Guardado', life: 3000 });
         this.supplyDialog = false;
         this.supply = this.getEmptySupply();
       });
@@ -114,12 +114,12 @@ export class InventoryListComponent implements OnInit {
     if (this.transaction.quantity > 0) {
       this.taqueriaService.addInventoryTransaction(this.transaction).subscribe({
         next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Transaction Recorded' });
+          this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: 'Movimiento Registrado' });
           this.transactionDialog = false;
           this.loadSupplies(); // Reload to check stock
         },
         error: (err) => {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to record transaction' });
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo registrar el movimiento' });
         }
       });
     }

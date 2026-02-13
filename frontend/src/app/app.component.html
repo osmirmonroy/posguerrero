@@ -3,20 +3,45 @@
     <img src="assets/logo.jpg" alt="Taqueria Logo" style="height:100px;margin:10px;position: relative;">
   </ng-template>
   <ng-template pTemplate="end">
-    <!-- Branch Selector for ADMIN -->
-    <div *ngIf="currentUser?.role === 'ADMIN' && branches.length > 0" class="flex align-items-center gap-2 mr-3">
-      <i class="pi pi-building text-primary"></i>
-      <p-dropdown [options]="branches" [(ngModel)]="selectedBranchId" (onChange)="onBranchChange()" optionLabel="name"
-        optionValue="id" placeholder="Todas las Sucursales" [showClear]="true" [style]="{'min-width': '200px'}">
-      </p-dropdown>
-    </div>
+    <div class="header-right-container flex align-items-center gap-2 md:gap-4 px-2">
+      <!-- Selección de Sucursal para ADMIN -->
+      <div *ngIf="currentUser?.role === 'ADMIN' && branches.length > 0"
+        class="branch-selector flex align-items-center gap-2">
+        <span class="text-xs md:text-sm font-semibold text-white-alpha-70 hidden sm:inline">Sucursal:</span>
+        <p-dropdown [options]="branches" [(ngModel)]="selectedBranchId" (onChange)="onBranchChange()" optionLabel="name"
+          optionValue="id" placeholder="Todas las Sucursales" [showClear]="true"
+          [style]="{'min-width': '150px', 'max-width': '220px'}" styleClass="header-dropdown">
+          <ng-template pTemplate="selectedItem">
+            <div class="flex align-items-center gap-2" *ngIf="selectedBranchId">
+              <i class="pi pi-building text-primary"></i>
+              <span>{{selectedBranchName}}</span>
+            </div>
+            <span *ngIf="!selectedBranchId">Todas las Sucursales</span>
+          </ng-template>
+          <ng-template let-branch pTemplate="item">
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-building text-primary"></i>
+              <span>{{branch.name}}</span>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
 
-    <!-- User Info -->
-    <div *ngIf="currentUser" class="flex align-items-center gap-2 mr-3">
-      <span class="font-bold"><i class="pi pi-user mr-1"></i>{{currentUser.username}}</span>
-      <span class="text-sm">({{currentUser.role}})</span>
-      <span *ngIf="currentUser.branchName" class="product-badge status-instock"><i
-          class="pi pi-building mr-1"></i>{{currentUser.branchName}}</span>
+      <!-- Info de Usuario -->
+      <div *ngIf="currentUser" class="user-display flex align-items-center gap-2">
+        <div class="flex flex-column align-items-end line-height-2">
+          <span class="font-bold text-white text-sm md:text-base">
+            <i class="pi pi-user mr-1 text-primary"></i>{{currentUser.username}}
+          </span>
+          <span class="text-xs text-white-alpha-60 font-medium uppercase">{{currentUser.role}}</span>
+        </div>
+
+        <div *ngIf="currentUser.branchName" class="hidden md:block">
+          <span class="product-badge status-instock text-xs py-1 px-2 border-round">
+            <i class="pi pi-building mr-1"></i>{{currentUser.branchName}}
+          </span>
+        </div>
+      </div>
     </div>
   </ng-template>
 </p-menubar>

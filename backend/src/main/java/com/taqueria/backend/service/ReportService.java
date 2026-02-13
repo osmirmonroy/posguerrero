@@ -50,10 +50,15 @@ public class ReportService {
 
                 List<Order> orders;
                 if (branchId != null) {
-                        orders = orderRepository.findByBranchId(branchId);
+                        orders = orderRepository.findByBranchIdAndIsActiveTrue(branchId);
                 } else {
-                        orders = orderRepository.findAll();
+                        orders = orderRepository.findAllByIsActiveTrue();
                 }
+
+                // Only consider PAID orders for sales report
+                orders = orders.stream()
+                                .filter(o -> o.getStatus() == com.taqueria.backend.model.OrderStatus.PAID)
+                                .collect(Collectors.toList());
 
                 if (startDate != null) {
                         orders = orders.stream()

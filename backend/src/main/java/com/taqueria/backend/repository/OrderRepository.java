@@ -12,22 +12,24 @@ import com.taqueria.backend.model.OrderStatus;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
-        List<Order> findByTableNumberAndStatus(Integer tableNumber, OrderStatus status);
+        List<Order> findByTableNumberAndStatusAndIsActiveTrue(Integer tableNumber, OrderStatus status);
 
-        List<Order> findByStatusIn(List<OrderStatus> statuses);
+        List<Order> findByStatusInAndIsActiveTrue(List<OrderStatus> statuses);
 
-        List<Order> findByStatusInAndBranchId(List<OrderStatus> statuses, Long branchId);
+        List<Order> findByStatusInAndBranchIdAndIsActiveTrue(List<OrderStatus> statuses, Long branchId);
 
-        List<Order> findByBranchId(Long branchId);
+        List<Order> findByBranchIdAndIsActiveTrue(Long branchId);
 
-        @Query("SELECT COALESCE(SUM(o.total), 0) FROM Order o WHERE o.user = :user AND o.status = 'PAID' AND o.date BETWEEN :startTime AND :endTime")
+        List<Order> findAllByIsActiveTrue();
+
+        @Query("SELECT COALESCE(SUM(o.total), 0) FROM Order o WHERE o.user = :user AND o.status = 'PAID' AND o.isActive = true AND o.date BETWEEN :startTime AND :endTime")
         Double sumTotalByUserAndDateBetween(@Param("user") User user, @Param("startTime") LocalDateTime startTime,
                         @Param("endTime") LocalDateTime endTime);
 
         @Query("SELECT new com.taqueria.backend.dto.TopProductDTO(i.product.name, SUM(i.quantity), SUM(i.quantity * i.product.price)) "
                         +
                         "FROM OrderItem i JOIN i.order o " +
-                        "WHERE o.status = 'PAID' AND o.date BETWEEN :startTime AND :endTime " +
+                        "WHERE o.status = 'PAID' AND o.isActive = true AND o.date BETWEEN :startTime AND :endTime " +
                         "AND (:branchId IS NULL OR o.branch.id = :branchId) " +
                         "GROUP BY i.product.name " +
                         "ORDER BY SUM(i.quantity) DESC")
@@ -37,7 +39,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         @Query("SELECT new com.taqueria.backend.dto.PaymentMethodStatsDTO(CAST(o.paymentMethod as string), COUNT(o), SUM(o.total)) "
                         +
                         "FROM Order o " +
-                        "WHERE o.status = 'PAID' AND o.date BETWEEN :startTime AND :endTime " +
+                        "WHERE o.status = 'PAID' AND o.isActive = true AND o.date BETWEEN :startTime AND :endTime " +
                         "AND (:branchId IS NULL OR o.branch.id = :branchId) " +
                         "GROUP BY o.paymentMethod")
         List<com.taqueria.backend.dto.PaymentMethodStatsDTO> findPaymentMethodStats(

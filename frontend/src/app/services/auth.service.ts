@@ -44,7 +44,9 @@ export class AuthService {
 
     hasRole(role: string): boolean {
         const user = this.currentUserValue;
-        return user && user.role === role;
+        if (!user) return false;
+        if (user.role === 'ADMIN') return true;
+        return user.role === role;
     }
 
     refreshToken(): Observable<any> {

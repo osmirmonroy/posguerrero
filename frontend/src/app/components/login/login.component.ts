@@ -38,7 +38,7 @@ export class LoginComponent {
           }
         },
         error: error => {
-          this.error = 'Invalid credentials';
+          this.error = 'Credenciales inválidas';
           console.error(error);
         }
       });

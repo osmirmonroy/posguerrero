@@ -41,7 +41,7 @@
                                 </div>
                                 <div class="product-grid-item-bottom flex justify-content-between align-items-center">
                                     <span class="product-price text-2xl font-bold text-primary">{{product.price |
-                                        currency}}</span>
+                                        currency:'MXN':'symbol':'1.2-2':'es-MX'}}</span>
                                     <p-button icon="pi pi-plus" (click)="openExtrasDialog(product)" label="Agregar"
                                         class="add-button"></p-button>
                                 </div>
@@ -65,7 +65,8 @@
                                     </div>
                                     <div
                                         class="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                                        <span class="text-2xl font-semibold text-primary">{{ product.price | currency
+                                        <span class="text-2xl font-semibold text-primary">{{ product.price |
+                                            currency:'MXN':'symbol':'1.2-2':'es-MX'
                                             }}</span>
                                         <button pButton icon="pi pi-plus" label="Agregar" class="p-button-lg"
                                             (click)="openExtrasDialog(product)"></button>
@@ -125,7 +126,7 @@
                                 </div>
                             </td>
                             <td class="font-semibold">
-                                {{ getItemTotal(item) | currency }}
+                                {{ getItemTotal(item) | currency:'MXN':'symbol':'1.2-2':'es-MX' }}
                             </td>
                             <td>
                                 <button pButton icon="pi pi-trash"
@@ -140,7 +141,8 @@
                 <div class="order-total mt-3 p-3 surface-100 border-round">
                     <div class="flex justify-content-between align-items-center">
                         <span class="text-xl font-bold">TOTAL:</span>
-                        <span class="text-3xl font-bold text-primary">{{ getOrderTotal() | currency }}</span>
+                        <span class="text-3xl font-bold text-primary">{{ getOrderTotal() |
+                            currency:'MXN':'symbol':'1.2-2':'es-MX' }}</span>
                     </div>
                 </div>
 

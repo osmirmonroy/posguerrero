@@ -3,6 +3,7 @@ import { Product, Order, OrderItem, OrderStatus, Extra } from '../../models/taqu
 import { TaqueriaService } from '../../services/taqueria.service';
 import { BranchService } from '../../services/branch.service';
 import { MessageService } from 'primeng/api';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-menu',
@@ -28,7 +29,8 @@ export class MenuComponent implements OnInit {
   constructor(
     private taqueriaService: TaqueriaService,
     private branchService: BranchService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -38,6 +40,28 @@ export class MenuComponent implements OnInit {
 
     this.taqueriaService.getExtras().subscribe(data => {
       this.extras = data;
+    });
+
+    // Handle order editing
+    this.route.queryParams.subscribe(params => {
+      const orderId = params['orderId'];
+      if (orderId) {
+        this.loadOrderForEditing(Number(orderId));
+      }
+    });
+  }
+
+  loadOrderForEditing(id: number) {
+    this.taqueriaService.getOrder(id).subscribe({
+      next: (order) => {
+        this.currentOrder = order;
+        this.orderItems = [...order.items];
+        this.customerName = order.customerName || '';
+        this.messageService.add({ severity: 'info', summary: 'Pedido Cargado', detail: `Editando pedido #${id}` });
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar el pedido para editar' });
+      }
     });
   }
 

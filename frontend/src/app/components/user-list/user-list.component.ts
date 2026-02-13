@@ -22,7 +22,7 @@ export class UserListComponent implements OnInit {
   }
 
   deleteUser(id: number | undefined): void {
-    if (id && confirm('Are you sure you want to delete this user?')) {
+    if (id && confirm('¿Está seguro de que desea eliminar este usuario?')) {
       this.taqueriaService.deleteUser(id).subscribe(() => {
         this.loadUsers();
       });

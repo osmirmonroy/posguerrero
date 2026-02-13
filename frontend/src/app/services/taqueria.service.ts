@@ -66,8 +66,16 @@ export class TaqueriaService {
         return this.http.get<Order[]>(url);
     }
 
+    getOrder(id: number): Observable<Order> {
+        return this.http.get<Order>(`${this.apiUrl}/orders/${id}`);
+    }
+
     updateOrder(id: number, order: Order): Observable<Order> {
         return this.http.put<Order>(`${this.apiUrl}/orders/${id}`, order);
+    }
+
+    deleteOrder(id: number, reason: string): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/orders/${id}?reason=${encodeURIComponent(reason)}`);
     }
 
     getOrdersByTable(tableNumber: number): Observable<Order[]> {

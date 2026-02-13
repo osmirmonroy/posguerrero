@@ -39,7 +39,12 @@ export interface Order {
     total?: number;
     items: OrderItem[];
     branch?: { id: number, name?: string };
-    // user?: User; // Avoid cyclic dependency if possible, or define User interface
+    createdBy?: any;
+    modifiedBy?: any;
+    deletedBy?: any;
+    deletionReason?: string;
+    deletionDate?: string;
+    isActive?: boolean;
 }
 
 export interface SalesReportDTO {

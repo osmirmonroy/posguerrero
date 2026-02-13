@@ -19,19 +19,30 @@ export class AppComponent implements OnInit {
     private branchService: BranchService
   ) { }
 
+  get selectedBranchName(): string {
+    if (!this.selectedBranchId) return 'Todas las Sucursales';
+    const branch = this.branches.find(b => b.id === this.selectedBranchId);
+    return branch ? branch.name : 'Todas las Sucursales';
+  }
+
   ngOnInit() {
+    console.log('AppComponent init - Branch Selector Debug');
+
     // Subscribe to selected branch changes
     this.branchService.selectedBranch$.subscribe(branchId => {
+      console.log('Selected branch changed to:', branchId);
       this.selectedBranchId = branchId;
     });
 
     // Subscribe to current user changes
     this.authService.currentUser.subscribe(user => {
+      console.log('Current user changed:', user?.username, 'Role:', user?.role);
       this.currentUser = user;
       this.updateMenu(user);
 
       // Load branches if user is ADMIN
       if (user && user.role === 'ADMIN') {
+        console.log('User is ADMIN, loading branches...');
         this.loadBranches();
       } else {
         this.branches = [];
@@ -43,9 +54,9 @@ export class AppComponent implements OnInit {
   updateMenu(user: any) {
     this.items = [];
 
-    if (!user) {
+    if (!user || !user.role) {
       this.items.push({
-        label: 'Login',
+        label: 'Iniciar Sesión',
         icon: 'pi pi-fw pi-sign-in',
         routerLink: '/login'
       });
@@ -68,7 +79,7 @@ export class AppComponent implements OnInit {
     if (user.role === 'ADMIN') {
       this.items.push(
         {
-          label: 'Dashboard',
+          label: 'Tablero Principal',
           icon: 'pi pi-fw pi-home',
           routerLink: '/admin/dashboard'
         },
@@ -116,7 +127,7 @@ export class AppComponent implements OnInit {
     });
 
     this.items.push({
-      label: 'Logout',
+      label: 'Salir',
       icon: 'pi pi-fw pi-sign-out',
       command: () => {
         this.branchService.clearSelectedBranch();
@@ -127,7 +138,10 @@ export class AppComponent implements OnInit {
 
   loadBranches() {
     this.branchService.getAllBranches().subscribe(branches => {
-      this.branches = branches.filter(b => b.isActive);
+      console.log('Branches data received:', branches);
+      // More inclusive filter: true or undefined/null
+      this.branches = branches.filter(b => b.isActive !== false);
+      console.log('Filtered branches for selector:', this.branches);
     });
   }
 

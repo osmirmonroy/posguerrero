@@ -5,7 +5,6 @@ import java.util.Map;
 import com.taqueria.backend.model.Extra;
 import com.taqueria.backend.model.Order;
 import com.taqueria.backend.model.Product;
-import com.taqueria.backend.model.OrderStatus;
 import com.taqueria.backend.model.Category;
 import com.taqueria.backend.model.OrderItem;
 import com.taqueria.backend.service.TaqueriaService;
@@ -44,8 +43,9 @@ public class TaqueriaController {
 
     @PostMapping("/orders")
     public Order createOrder(@RequestBody Order order, java.security.Principal principal) {
+        com.taqueria.backend.model.User user = null;
         if (principal != null) {
-            com.taqueria.backend.model.User user = userRepository.findByUsername(principal.getName()).orElse(null);
+            user = userRepository.findByUsername(principal.getName()).orElse(null);
             order.setUser(user);
             if (user != null) {
                 // If user is ADMIN and branch is provided in order, use it.
@@ -57,7 +57,7 @@ public class TaqueriaController {
                 }
             }
         }
-        return taqueriaService.createOrder(order);
+        return taqueriaService.createOrder(order, user);
     }
 
     @GetMapping("/orders")
@@ -65,15 +65,38 @@ public class TaqueriaController {
         return taqueriaService.getAllOrders(branchId);
     }
 
+    @GetMapping("/orders/{id}")
+    public Order getOrder(@PathVariable Long id) {
+        return taqueriaService.getOrder(id);
+    }
+
     @PutMapping("/orders/{id}")
-    public Order updateOrder(@PathVariable Long id, @RequestBody Order order) {
-        return taqueriaService.updateOrder(id, order);
+    public Order updateOrder(@PathVariable Long id, @RequestBody Order order, java.security.Principal principal) {
+        com.taqueria.backend.model.User user = null;
+        if (principal != null) {
+            user = userRepository.findByUsername(principal.getName()).orElse(null);
+        }
+        return taqueriaService.updateOrder(id, order, user);
+    }
+
+    @DeleteMapping("/orders/{id}")
+    public void deleteOrder(@PathVariable Long id, @RequestParam String reason, java.security.Principal principal) {
+        com.taqueria.backend.model.User user = null;
+        if (principal != null) {
+            user = userRepository.findByUsername(principal.getName()).orElse(null);
+        }
+        taqueriaService.deleteOrder(id, reason, user);
     }
 
     @PutMapping("/orders/items/{itemId}/status")
-    public OrderItem updateOrderItemStatus(@PathVariable Long itemId, @RequestBody Map<String, String> payload) {
+    public OrderItem updateOrderItemStatus(@PathVariable Long itemId, @RequestBody Map<String, String> payload,
+            java.security.Principal principal) {
+        com.taqueria.backend.model.User user = null;
+        if (principal != null) {
+            user = userRepository.findByUsername(principal.getName()).orElse(null);
+        }
         return taqueriaService.updateOrderItemStatus(itemId,
-                com.taqueria.backend.model.OrderStatus.valueOf(payload.get("status")));
+                com.taqueria.backend.model.OrderStatus.valueOf(payload.get("status")), user);
     }
 
     @GetMapping("/orders/table/{tableNumber}")
@@ -137,10 +160,15 @@ public class TaqueriaController {
     }
 
     @PatchMapping("/orders/{id}/status")
-    public Order updateOrderStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> statusMap) {
+    public Order updateOrderStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> statusMap,
+            java.security.Principal principal) {
         String statusStr = statusMap.get("status");
         com.taqueria.backend.model.OrderStatus status = com.taqueria.backend.model.OrderStatus.valueOf(statusStr);
-        return taqueriaService.updateOrderStatus(id, status);
+        com.taqueria.backend.model.User user = null;
+        if (principal != null) {
+            user = userRepository.findByUsername(principal.getName()).orElse(null);
+        }
+        return taqueriaService.updateOrderStatus(id, status, user);
     }
 
     // Category Endpoints

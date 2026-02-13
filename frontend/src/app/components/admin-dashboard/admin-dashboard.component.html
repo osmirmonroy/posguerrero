@@ -1,6 +1,6 @@
 <div class="card fade-in">
     <div class="flex justify-content-between align-items-center mb-4">
-        <h2>Dashboard Administrativo - Hoy</h2>
+        <h2>Tablero Administrativo - Hoy</h2>
         <button pButton label="Actualizar" icon="pi pi-refresh" (click)="loadDashboardData()"></button>
     </div>
 
@@ -48,7 +48,7 @@
                         <i class="pi pi-exclamation-triangle text-red-500 text-xl"></i>
                     </div>
                 </div>
-                <span class="text-red-500 font-medium">Items Críticos</span>
+                <span class="text-red-500 font-medium">Artículos Críticos</span>
             </div>
         </div>
     </div>
@@ -57,7 +57,7 @@
     <div class="grid">
         <div class="col-12 md:col-6">
             <div class="card">
-                <h5>Top Productos (Hoy)</h5>
+                <h5>Mejores Productos (Hoy)</h5>
                 <p-chart type="bar" [data]="productsChart" [options]="chartOptions" *ngIf="productsChart"></p-chart>
             </div>
         </div>

@@ -41,11 +41,12 @@ export class SupplierCrudComponent implements OnInit {
 
   deleteSupplier(sup: Supplier) {
     this.confirmationService.confirm({
-      message: 'Delete ' + sup.name + '?',
+      message: '¿Está seguro de que desea eliminar a ' + sup.name + '?',
+      header: 'Confirmar',
       accept: () => {
         if (sup.id) {
           this.taqueriaService.deleteSupplier(sup.id).subscribe(() => {
-            this.messageService.add({ severity: 'success', summary: 'Deleted' });
+            this.messageService.add({ severity: 'success', summary: 'Cifrado', detail: 'Proveedor Eliminado' });
             this.loadSuppliers();
           });
         }
@@ -59,7 +60,7 @@ export class SupplierCrudComponent implements OnInit {
       this.taqueriaService.saveSupplier(this.supplier).subscribe(() => {
         this.loadSuppliers();
         this.supplierDialog = false;
-        this.messageService.add({ severity: 'success', summary: 'Saved' });
+        this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: 'Proveedor Guardado' });
       });
     }
   }
