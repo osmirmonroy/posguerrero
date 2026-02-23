@@ -29,32 +29,56 @@
     color: white !important;
 }
 
-/* Custom styles for the branch selector in the header */
-:host ::ng-deep .header-dropdown.p-dropdown {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    transition: all 0.2s ease;
+/* Unified User Profile & Branch Selector */
+.user-profile-wrapper {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
 }
 
-:host ::ng-deep .header-dropdown.p-dropdown:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.4);
+.user-profile-wrapper:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.role-badge {
+    background: var(--primary-color);
+    color: white;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.username-text {
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Custom styles for the branch selector in the header */
+:host ::ng-deep .header-dropdown.p-dropdown {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 :host ::ng-deep .header-dropdown.p-dropdown .p-dropdown-label {
     color: white !important;
     font-size: 0.9rem;
-    padding: 0.5rem 0.75rem;
+    padding: 0.25rem 0.5rem;
+    font-weight: 500;
+}
+
+:host ::ng-deep .header-dropdown.compact-dropdown {
+    min-width: 140px;
 }
 
 :host ::ng-deep .header-dropdown.p-dropdown .p-dropdown-trigger {
-    color: white !important;
-    width: 2.5rem;
+    color: var(--primary-color) !important;
+    width: 1.5rem;
 }
 
 :host ::ng-deep .header-dropdown.p-dropdown .p-dropdown-clear-icon {
-    color: rgba(255, 255, 255, 0.6) !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    right: 2rem;
 }
 
 /* Panel styles (dropdown overlay) */
@@ -62,43 +86,41 @@
     background-color: #1e1e1e !important;
     border: 1px solid #333 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+    border-radius: 8px !important;
 }
 
 :host ::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
     color: #e0e0e0 !important;
-    padding: 0.75rem 1rem !important;
+    padding: 0.6rem 1rem !important;
+    font-size: 0.9rem;
 }
 
 :host ::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item:hover {
-    background-color: #d32f2f !important;
+    background-color: var(--primary-color) !important;
     color: white !important;
 }
 
 :host ::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
-    background-color: #b71c1c !important;
+    background-color: var(--primary-dark) !important;
     color: white !important;
 }
 
 /* Responsive adjustments */
 @media screen and (max-width: 768px) {
+    .user-profile-wrapper {
+        padding: 0.4rem 0.6rem !important;
+        gap: 0.5rem !important;
+    }
+
+    .compact-dropdown {
+        min-width: 110px !important;
+    }
+
+    .username-text {
+        font-size: 0.85rem !important;
+    }
+
     :host ::ng-deep .p-menubar {
         padding: 0.5rem;
-    }
-
-    .header-right-container {
-        gap: 0.5rem !important;
-    }
-
-    :host ::ng-deep .header-dropdown.p-dropdown {
-        min-width: 140px !important;
-    }
-
-    :host ::ng-deep .header-dropdown.p-dropdown .p-dropdown-label {
-        font-size: 0.8rem;
-        padding: 0.4rem 0.6rem;
-    }
-
-    :host ::ng-deep .header-right-container .user-display {
-        gap: 0.5rem !important;
     }
 }

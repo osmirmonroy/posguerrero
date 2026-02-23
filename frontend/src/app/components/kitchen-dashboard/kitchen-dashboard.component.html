@@ -1,68 +1,123 @@
-<div class="grid p-3">
+<div class="grid p-2 md:p-3 bg-surface-ground min-vh-100">
     <!-- Column: Pendientes -->
-    <div class="col-12 md:col-4">
-        <div class="surface-card p-3 shadow-2 border-round">
-            <div class="text-xl font-bold mb-3 text-orange-500">Pendientes ({{pendingItems.length}})</div>
-            <div *ngFor="let wrap of pendingItems" class="mb-3">
-                <p-card
-                    [header]="'Orden #' + wrap.order.id + (wrap.order.tableNumber ? ' (Mesa ' + wrap.order.tableNumber + ')' : '') + (wrap.order.customerName ? ' - ' + wrap.order.customerName : '')"
-                    [style]="{'background-color': '#fff3e0'}">
-                    <div class="text-500 mb-2">{{ getElapsedTime(wrap.order.date) }}</div>
-                    <div class="font-bold text-lg">{{wrap.item.quantity}}x {{wrap.item.product.name}}</div>
-                    <div *ngIf="wrap.item.extras && wrap.item.extras.length > 0" class="text-sm text-600 pl-3">
-                        <div *ngFor="let extra of wrap.item.extras">+ {{extra.name}}</div>
+    <div class="col-12 lg:col-4">
+        <div class="card shadow-2 border-round-xl h-full border-top-3 border-orange-500">
+            <div class="flex justify-content-between align-items-center mb-4">
+                <span class="text-xl font-black text-orange-600 uppercase flex align-items-center gap-2">
+                    <i class="pi pi-clock"></i> Pendientes
+                </span>
+                <p-badge [value]="pendingItems.length.toString()" severity="warning" size="large"></p-badge>
+            </div>
+
+            <div class="overflow-y-auto" style="max-height: calc(100vh - 200px);">
+                <div *ngFor="let wrap of pendingItems" class="mb-4">
+                    <div
+                        class="kitchen-order-card transition-all duration-300 p-4 border-round-xl shadow-1 hover:shadow-3 bg-orange-50 border-1 border-orange-100">
+                        <div class="flex justify-content-between align-items-start mb-3">
+                            <div class="flex flex-column">
+                                <span class="font-bold text-xl text-orange-900">#{{wrap.order.id}}</span>
+                                <span class="text-sm text-orange-700 font-medium" *ngIf="wrap.order.customerName">
+                                    <i class="pi pi-user mr-1"></i>{{wrap.order.customerName}}
+                                </span>
+                            </div>
+                            <span [class]="getTimerClass(wrap.order.date)"
+                                class="px-3 py-1 border-round-lg text-sm font-bold shadow-1">
+                                {{ getElapsedTime(wrap.order.date) }}
+                            </span>
+                        </div>
+
+                        <p-divider styleClass="my-2 border-orange-200"></p-divider>
+
+                        <div class="py-3">
+                            <div class="flex align-items-center gap-3 mb-2">
+                                <span
+                                    class="bg-orange-600 text-white w-2rem h-2rem flex align-items-center justify-content-center border-circle font-bold shadow-2">
+                                    {{wrap.item.quantity}}
+                                </span>
+                                <span class="font-black text-xl text-900">{{wrap.item.product.name}}</span>
+                            </div>
+
+                            <div *ngIf="wrap.item.extras && wrap.item.extras.length > 0" class="pl-5">
+                                <span *ngFor="let extra of wrap.item.extras"
+                                    class="inline-block bg-white text-orange-800 text-xs px-2 py-1 border-round-md mr-2 mb-1 border-1 border-orange-200">
+                                    + {{extra.name}}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <button pButton label="EMPEZAR PREPARACIÓN" icon="pi pi-play"
+                                class="p-button-warning p-button-lg w-full py-3 font-bold border-round-xl shadow-2 hover:shadow-4"
+                                (click)="updateItemStatus(wrap.item, 'PREPARING')"></button>
+                        </div>
                     </div>
-                    <ng-template pTemplate="footer">
-                        <button pButton label="Preparar" icon="pi pi-cog" class="p-button-warning"
-                            (click)="updateItemStatus(wrap.item, 'PREPARING')"></button>
-                    </ng-template>
-                </p-card>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Column: Preparando -->
-    <div class="col-12 md:col-4">
-        <div class="surface-card p-3 shadow-2 border-round">
-            <div class="text-xl font-bold mb-3 text-blue-500">Preparando ({{preparingItems.length}})</div>
-            <div *ngFor="let wrap of preparingItems" class="mb-3">
-                <p-card
-                    [header]="'Orden #' + wrap.order.id + (wrap.order.tableNumber ? ' (Mesa ' + wrap.order.tableNumber + ')' : '') + (wrap.order.customerName ? ' - ' + wrap.order.customerName : '')"
-                    [style]="{'background-color': '#e3f2fd'}">
-                    <div class="text-500 mb-2">{{ getElapsedTime(wrap.order.date) }}</div>
-                    <div class="font-bold text-lg">{{wrap.item.quantity}}x {{wrap.item.product.name}}</div>
-                    <div *ngIf="wrap.item.extras && wrap.item.extras.length > 0" class="text-sm text-600 pl-3">
-                        <div *ngFor="let extra of wrap.item.extras">+ {{extra.name}}</div>
+    <div class="col-12 lg:col-4">
+        <div class="card shadow-2 border-round-xl h-full border-top-3 border-blue-500">
+            <div class="flex justify-content-between align-items-center mb-4">
+                <span class="text-xl font-black text-blue-600 uppercase flex align-items-center gap-2">
+                    <i class="pi pi-cog pi-spin"></i> Preparando
+                </span>
+                <p-badge [value]="preparingItems.length.toString()" severity="info" size="large"></p-badge>
+            </div>
+
+            <div class="overflow-y-auto" style="max-height: calc(100vh - 200px);">
+                <div *ngFor="let wrap of preparingItems" class="mb-4">
+                    <div class="kitchen-order-card p-4 border-round-xl shadow-1 bg-blue-50 border-1 border-blue-100">
+                        <div class="flex justify-content-between align-items-start mb-3">
+                            <span class="font-bold text-xl text-blue-900">#{{wrap.order.id}}</span>
+                            <span class="text-500 font-medium">{{ getElapsedTime(wrap.order.date) }}</span>
+                        </div>
+
+                        <div class="py-2">
+                            <div class="flex align-items-center gap-3">
+                                <span
+                                    class="bg-blue-600 text-white w-2.5rem h-2.5rem flex align-items-center justify-content-center border-circle font-bold">
+                                    {{wrap.item.quantity}}
+                                </span>
+                                <span class="font-black text-xl text-900">{{wrap.item.product.name}}</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button pButton label="MARCAR COMO LISTO" icon="pi pi-check-circle"
+                                class="p-button-success p-button-lg w-full py-3 font-bold border-round-xl"
+                                (click)="updateItemStatus(wrap.item, 'READY')"></button>
+                        </div>
                     </div>
-                    <ng-template pTemplate="footer">
-                        <button pButton label="Listo" icon="pi pi-check" class="p-button-success"
-                            (click)="updateItemStatus(wrap.item, 'READY')"></button>
-                    </ng-template>
-                </p-card>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Column: Listos -->
-    <div class="col-12 md:col-4">
-        <div class="surface-card p-3 shadow-2 border-round">
-            <div class="text-xl font-bold mb-3 text-green-500">Listos ({{readyItems.length}})</div>
-            <div *ngFor="let wrap of readyItems" class="mb-3">
-                <p-card
-                    [header]="'Orden #' + wrap.order.id + (wrap.order.tableNumber ? ' (Mesa ' + wrap.order.tableNumber + ')' : '') + (wrap.order.customerName ? ' - ' + wrap.order.customerName : '')"
-                    [style]="{'background-color': '#e8f5e9'}">
-                    <div class="text-500 mb-2">{{ getElapsedTime(wrap.order.date) }}</div>
-                    <div class="font-bold items-center">
-                        <i class="pi pi-check-circle mr-2"></i>{{wrap.item.quantity}}x {{wrap.item.product.name}}
-                    </div>
-                    <div *ngIf="wrap.item.extras && wrap.item.extras.length > 0" class="text-sm text-600 pl-3">
-                        <div *ngFor="let extra of wrap.item.extras">+ {{extra.name}}</div>
-                    </div>
-                    <ng-template pTemplate="footer">
-                        <button pButton label="Entregado" icon="pi pi-send" class="p-button-secondary"
+    <div class="col-12 lg:col-4">
+        <div class="card shadow-2 border-round-xl h-full border-top-3 border-green-500">
+            <div class="flex justify-content-between align-items-center mb-4">
+                <span class="text-xl font-black text-green-600 uppercase flex align-items-center gap-2">
+                    <i class="pi pi-verified"></i> Listos
+                </span>
+                <p-badge [value]="readyItems.length.toString()" severity="success" size="large"></p-badge>
+            </div>
+
+            <div class="overflow-y-auto" style="max-height: calc(100vh - 200px);">
+                <div *ngFor="let wrap of readyItems" class="mb-4 opacity-70 hover:opacity-100 transition-opacity">
+                    <div class="p-4 border-round-xl shadow-1 bg-green-50 border-1 border-green-100">
+                        <div class="flex justify-content-between align-items-center mb-2">
+                            <span class="font-bold text-xl text-green-900">#{{wrap.order.id}}</span>
+                            <i class="pi pi-check-circle text-green-600 text-2xl"></i>
+                        </div>
+                        <div class="font-bold text-lg text-800">{{wrap.item.quantity}}x {{wrap.item.product.name}}</div>
+                        <button pButton label="ENTREGADO" icon="pi pi-send"
+                            class="p-button-secondary p-button-sm w-full mt-3"
                             (click)="updateItemStatus(wrap.item, 'DELIVERED')"></button>
-                    </ng-template>
-                </p-card>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

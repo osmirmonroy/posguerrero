@@ -1,51 +1,49 @@
 <p-toast></p-toast>
 
-<div class="card">
-    <p-toolbar styleClass="mb-4 gap-2">
+<div class="card shadow-3 border-round-xl">
+    <p-toolbar styleClass="mb-4 surface-50 border-round-lg">
         <ng-template pTemplate="left">
-            <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success mr-2"
+            <h5 class="m-0 text-xl font-bold text-700">Gestión de Productos</h5>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <button pButton pRipple label="Añadir Producto" icon="pi pi-plus" class="p-button-success border-round-lg"
                 (click)="openNew()"></button>
         </ng-template>
     </p-toolbar>
 
-    <p-table [value]="products" [rows]="10" [paginator]="true" [tableStyle]="{'min-width': '75rem'}" [rowHover]="true"
-        dataKey="id" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
-        [showCurrentPageReport]="true">
-        <ng-template pTemplate="caption">
-            <div class="flex align-items-center justify-content-between">
-                <h5 class="m-0">Gestionar Productos</h5>
-            </div>
-        </ng-template>
+    <p-table [value]="products" [rows]="10" [paginator]="true" [rowHover]="true" dataKey="id" responsiveLayout="stack"
+        breakpoint="960px" styleClass="p-datatable-responsive-stack"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" [showCurrentPageReport]="true">
+
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="name" style="min-width:15rem">Nombre <p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon></th>
                 <th pSortableColumn="price">Precio <p-sortIcon field="price"></p-sortIcon></th>
                 <th pSortableColumn="category">Categoría <p-sortIcon field="category"></p-sortIcon></th>
-                <th pSortableColumn="description" style="min-width:10rem">Descripción <p-sortIcon
-                        field="description"></p-sortIcon></th>
-                <th></th>
+                <th pSortableColumn="description">Descripción <p-sortIcon field="description"></p-sortIcon></th>
+                <th class="text-center">Acciones</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
-            <tr>
-                <td>{{product.name}}</td>
-                <td>{{product.price | currency:'MXN':'symbol':'1.2-2':'es-MX'}}</td>
-                <td>{{product.category}}</td>
-                <td>{{product.description}}</td>
-                <td>
-                    <button pButton pRipple icon="pi pi-dollar" class="p-button-rounded p-button-info mr-2"
-                        (click)="openPricingDialog(product)" pTooltip="Precios por Sucursal"></button>
-                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
-                        (click)="editProduct(product)"></button>
-                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
-                        (click)="deleteProduct(product)"></button>
+            <tr class="transition-all duration-200">
+                <td><span class="p-column-title">Nombre</span>{{product.name}}</td>
+                <td><span class="p-column-title">Precio</span>{{product.price | currency:'MXN'}}</td>
+                <td><span class="p-column-title">Categoría</span>{{product.category}}</td>
+                <td><span class="p-column-title">Descripción</span>{{product.description}}</td>
+                <td class="text-center">
+                    <span class="p-column-title">Acciones</span>
+                    <div class="flex justify-content-center gap-2">
+                        <button pButton pRipple icon="pi pi-dollar" class="p-button-rounded p-button-text p-button-info"
+                            (click)="openPricingDialog(product)" pTooltip="Precios por Sucursal"></button>
+                        <button pButton pRipple icon="pi pi-pencil"
+                            class="p-button-rounded p-button-text p-button-success" (click)="editProduct(product)"
+                            pTooltip="Editar"></button>
+                        <button pButton pRipple icon="pi pi-trash"
+                            class="p-button-rounded p-button-text p-button-warning" (click)="deleteProduct(product)"
+                            pTooltip="Eliminar"></button>
+                    </div>
                 </td>
             </tr>
-        </ng-template>
-        <ng-template pTemplate="summary">
-            <div class="flex align-items-center justify-content-between">
-                En total hay {{products ? products.length : 0 }} productos.
-            </div>
         </ng-template>
     </p-table>
 </div>

@@ -249,6 +249,10 @@ export class MenuComponent implements OnInit {
     this.groupProducts();
   }
 
+  canSendOrder(): boolean {
+    return this.orderItems.length > 0;
+  }
+
   clearOrder() {
     this.currentOrder = null;
     this.orderItems = [];

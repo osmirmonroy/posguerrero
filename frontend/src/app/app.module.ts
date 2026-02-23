@@ -25,6 +25,11 @@ import { ToastModule } from 'primeng/toast';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DividerModule } from 'primeng/divider';
 import { DropdownModule } from 'primeng/dropdown';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { BadgeModule } from 'primeng/badge';
+import { PasswordModule } from 'primeng/password';
+import { MessageModule } from 'primeng/message';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ProductCrudComponent } from './components/product-crud/product-crud.component';
 import { CategoryCrudComponent } from './components/category-crud/category-crud.component';
@@ -62,9 +67,6 @@ import { LoadingSpinnerComponent } from './components/loading-spinner/loading-sp
     ShiftControlComponent,
     InventoryListComponent,
     SupplierCrudComponent,
-    SupplierCrudComponent,
-    KardexViewComponent,
-    SupplierCrudComponent,
     KardexViewComponent,
     AdminDashboardComponent,
     BranchListComponent,
@@ -91,8 +93,12 @@ import { LoadingSpinnerComponent } from './components/loading-spinner/loading-sp
     CheckboxModule,
     DividerModule,
     DropdownModule,
+    SelectButtonModule,
+    OverlayPanelModule,
+    BadgeModule,
+    PasswordModule,
+    MessageModule,
     CalendarModule,
-    MultiSelectModule,
     MultiSelectModule,
     ChartModule,
     TabViewModule

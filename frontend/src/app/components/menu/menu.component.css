@@ -1,135 +1,102 @@
-/* Product Grid Items */
-.product-grid-item {
-    margin: .5em;
-    border: 1px solid #dee2e6;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    min-height: 280px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+.category-scroll-container::-webkit-scrollbar {
+    height: 4px;
 }
 
-.product-grid-item:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+.category-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--surface-border);
+    border-radius: 10px;
 }
 
-.product-grid-item-content {
-    text-align: center;
-    flex: 1;
+.product-card-premium {
+    background: #ffffff;
+    border: 1px solid var(--surface-border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.product-icon {
-    padding: 1rem;
-    background: var(--surface-100);
-    border-radius: 50%;
-    width: 80px;
-    height: 80px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.product-card-premium:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary-light);
 }
 
-.product-name {
-    font-size: 1.25rem;
-    font-weight: 700;
-    min-height: 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+:host ::ng-deep .view-switcher .p-button {
+    background: #ffffff !important;
+    color: var(--text-color-secondary) !important;
+    border: 1px solid var(--surface-border) !important;
 }
 
-.product-description {
-    margin: 0.5rem 0 1rem 0;
-    color: var(--text-color-secondary);
-    font-size: 0.9rem;
-    min-height: 2.5rem;
+:host ::ng-deep .view-switcher .p-button.p-highlight {
+    background: var(--primary-color) !important;
+    color: #ffffff !important;
+    border-color: var(--primary-color) !important;
 }
 
-.product-price {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--primary-color);
+:host ::ng-deep .view-switcher .p-button:focus {
+    box-shadow: none !important;
 }
 
-.product-grid-item-bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--surface-300);
+.order-items-scroll::-webkit-scrollbar,
+.order-items-scroll-mobile::-webkit-scrollbar {
+    width: 6px;
 }
 
-/* Larger touch targets for buttons */
-.add-button ::ng-deep .p-button {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+.order-items-scroll::-webkit-scrollbar-thumb,
+.order-items-scroll-mobile::-webkit-scrollbar-thumb {
+    background: var(--surface-border);
+    border-radius: 10px;
 }
 
-/* Category Filter Chips */
-.category-chip {
-    border-radius: 20px;
-    font-weight: 600;
-    transition: all 0.2s;
+/* Specific styling for the floating bar transitions */
+.fixed.bottom-0 {
+    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.category-chip:hover {
-    transform: scale(1.05);
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
-/* Order Panel */
-.order-panel {
+/* Desktop cart sticky positioning refinement */
+.sticky.top-0 {
     position: sticky;
-    top: 1rem;
+    top: 5rem !important;
+    /* Adjust based on header height */
 }
 
-.order-items-container {
-    background: var(--surface-50);
+/* Category chip hover effects */
+.category-chip:hover {
+    background: var(--primary-light) !important;
+    color: var(--primary-dark) !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* Dialog refinements */
+:host ::ng-deep .extras-dialog-premium .p-dialog-header {
+    background: #fdfdfd;
+    border-bottom: 1px solid var(--surface-border);
+    padding: 1.5rem;
+}
+
+:host ::ng-deep .extras-dialog-premium .p-dialog-content {
+    background: #ffffff;
     padding: 1rem;
-    border-radius: var(--border-radius);
 }
 
-.order-total {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-600) 100%);
-    color: white;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+:host ::ng-deep .extras-dialog-premium .p-dialog-footer {
+    background: #fdfdfd;
+    border-top: 1px solid var(--surface-border);
+    padding: 1rem;
 }
 
-.order-total .text-primary {
-    color: white !important;
-}
-
-/* Empty Order State */
-.empty-order {
-    background: var(--surface-50);
-    border-radius: var(--border-radius);
-    border: 2px dashed var(--surface-300);
-}
-
-/* Quantity Controls */
-::ng-deep .p-button-rounded.p-button-sm {
-    width: 2rem;
-    height: 2rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .product-grid-item {
-        min-height: 240px;
-    }
-
-    .order-panel {
-        position: relative;
-    }
-}
-
-/* Touch-friendly spacing */
-::ng-deep .p-button-lg {
-    padding: 0.875rem 1.75rem;
-    font-size: 1.125rem;
+/* Input floating label styling */
+:host ::ng-deep .p-float-label input:focus~label,
+:host ::ng-deep .p-float-label input.p-filled~label {
+    color: var(--primary-color) !important;
+    font-weight: 600;
 }

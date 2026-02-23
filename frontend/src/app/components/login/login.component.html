@@ -1,17 +1,45 @@
-<div class="login-container">
-    <h2>Iniciar Sesión</h2>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <div class="form-group">
-            <label for="username">Usuario</label>
-            <input type="text" id="username" formControlName="username" class="form-control"
-                placeholder="Ingrese su usuario" />
-        </div>
-        <div class="form-group">
-            <label for="password">Contraseña</label>
-            <input type="password" id="password" formControlName="password" class="form-control"
-                placeholder="Ingrese su contraseña" />
-        </div>
-        <div *ngIf="error" class="error-message">{{ error }}</div>
-        <button type="submit" [disabled]="loginForm.invalid">Entrar</button>
-    </form>
+<div class="flex align-items-center justify-content-center min-vh-100 p-3 login-page-container">
+    <p-card [style]="{width: '100%', maxWidth: '400px'}" styleClass="shadow-4">
+        <ng-template pTemplate="header">
+            <div class="flex flex-column align-items-center pt-5">
+                <img src="assets/logo.jpg" alt="Taqueria Logo"
+                    style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;" class="mb-3 shadow-2">
+                <h2 class="m-0 text-primary">Taquería Guerrero</h2>
+                <p class="text-600">Sistema de Punto de Venta</p>
+            </div>
+        </ng-template>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="p-fluid">
+            <div class="field mb-4">
+                <span class="p-float-label p-input-icon-left">
+                    <i class="pi pi-user"></i>
+                    <input type="text" id="username" pInputText formControlName="username" />
+                    <label for="username">Usuario</label>
+                </span>
+            </div>
+
+            <div class="field mb-4">
+                <span class="p-float-label p-input-icon-left">
+                    <i class="pi pi-lock"></i>
+                    <p-password id="password" formControlName="password" [feedback]="false" [toggleMask]="true"
+                        inputStyleClass="w-full">
+                    </p-password>
+                    <label for="password">Contraseña</label>
+                </span>
+            </div>
+
+            <div *ngIf="error" class="mb-3">
+                <p-message severity="error" [text]="error" styleClass="w-full"></p-message>
+            </div>
+
+            <button pButton type="submit" label="Iniciar Sesión" icon="pi pi-sign-in" [disabled]="loginForm.invalid"
+                class="p-button-lg"></button>
+        </form>
+
+        <ng-template pTemplate="footer">
+            <div class="text-center text-500 text-sm">
+                Versión 2.0 &copy; 2024
+            </div>
+        </ng-template>
+    </p-card>
 </div>

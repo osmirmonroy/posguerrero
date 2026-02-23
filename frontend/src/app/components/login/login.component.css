@@ -1,42 +1,36 @@
-.login-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.login-page-container {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #8b0000 100%);
+    background-size: cover;
 }
 
-.form-group {
-    margin-bottom: 15px;
+:host ::ng-deep .p-card {
+    border-radius: 20px;
+    overflow: hidden;
 }
 
-label {
-    display: block;
-    margin-bottom: 5px;
+:host ::ng-deep .p-card .p-card-header {
+    background: #fdfdfd;
 }
 
-.form-control {
+:host ::ng-deep .p-card .p-card-body {
+    padding: 2rem;
+}
+
+.field label {
+    font-weight: 500;
+}
+
+:host ::ng-deep .p-password input {
     width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
 }
 
-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
+.p-button-lg {
+    font-size: 1.1rem;
+    padding: 0.85rem;
 }
 
-button:disabled {
-    background-color: #ccc;
-}
-
-.error-message {
-    color: red;
-    margin-bottom: 10px;
+@media screen and (max-width: 480px) {
+    .p-card {
+        margin: 1rem;
+    }
 }

@@ -1,78 +1,96 @@
-/* Global Styles */
+/* Global Styles & UX/UI Overhaul */
 :root {
+    /* Primary Reds */
     --primary-color: #D32F2F;
-    /* Red */
-    --secondary-color: #FBC02D;
-    /* Yellow */
-    --text-color: #000000;
-    /* Black */
-    --background-color: #f5f5f5;
+    --primary-dark: #B71C1C;
+    --primary-light: #FFCDD2;
+
+    /* Secondary & Accent */
+    --accent-color: #FBC02D;
+
+    /* Neutral Palette */
+    --text-color: #212121;
+    --text-color-secondary: #757575;
+    --background-color: #F8F9FA;
+    --surface-card: #FFFFFF;
+    --surface-border: #E0E0E0;
+
+    /* Radii & Shadows */
+    --border-radius: 12px;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     background-color: var(--background-color);
     color: var(--text-color);
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
 }
 
-/* PrimeNG Overrides for Theme */
-.p-button {
-    background: var(--primary-color) !important;
-    border: 1px solid var(--primary-color) !important;
-    color: #ffffff !important;
-}
-
-.p-button.p-button-danger {
-    background: #d32f2f !important;
-    border: 1px solid #d32f2f !important;
-    color: #ffffff !important;
-}
-
-.p-button:enabled:hover {
-    background: #b71c1c !important;
-    /* Darker Red */
-    border-color: #b71c1c !important;
-}
-
-.p-button.p-button-success {
-    background: #388e3c !important;
-    /* Green for positive actions */
-    border: 1px solid #388e3c !important;
-}
-
-.p-button.p-button-warning {
-    background: var(--secondary-color) !important;
-    border: 1px solid var(--secondary-color) !important;
-    color: #000000 !important;
-}
-
-.p-menubar {
-    background: #000000 !important;
-    border: none !important;
-}
-
-.p-menubar .p-menuitem-link .p-menuitem-text,
-.p-menubar .p-menuitem-link .p-menuitem-icon {
-    color: #ffffff !important;
-}
-
-.p-menubar .p-menuitem-link:hover {
-    background: #424242 !important;
-}
-
+/* Global Card Styling */
 .card {
-    background: #ffffff;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
-    margin-bottom: 2rem;
+    background: var(--surface-card);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--surface-border);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+    transition: box-shadow 0.3s ease;
 }
 
+.card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+/* PrimeNG Overrides for consistent look */
+.p-button {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+}
+
+.p-inputtext {
+    border-radius: 8px !important;
+    padding: 0.75rem !important;
+}
+
+/* Responsive Table Utilities (Stack implementation) */
+@media screen and (max-width: 960px) {
+    .p-datatable.p-datatable-responsive-stack .p-datatable-thead>tr>th {
+        display: none !important;
+    }
+
+    .p-datatable.p-datatable-responsive-stack .p-datatable-tbody>tr>td {
+        display: flex;
+        align-items: center;
+        width: 100% !important;
+        text-align: left;
+        border: 0 none;
+        padding: 0.5rem 1rem !important;
+    }
+
+    .p-datatable.p-datatable-responsive-stack .p-datatable-tbody>tr>td:last-child {
+        border-bottom: 1px solid var(--surface-border);
+        padding-bottom: 1rem !important;
+    }
+
+    .p-datatable.p-datatable-responsive-stack .p-datatable-tbody>tr>td .p-column-title {
+        min-width: 30%;
+        font-weight: 700;
+        display: inline-block;
+        margin-right: 1rem;
+    }
+}
+
+/* Typography refinement */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
+    margin-top: 0;
+    font-weight: 700;
     color: var(--text-color);
 }

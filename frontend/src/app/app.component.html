@@ -3,43 +3,39 @@
     <img src="assets/logo.jpg" alt="Taqueria Logo" style="height:100px;margin:10px;position: relative;">
   </ng-template>
   <ng-template pTemplate="end">
-    <div class="header-right-container flex align-items-center gap-2 md:gap-4 px-2">
-      <!-- Selección de Sucursal para ADMIN -->
-      <div *ngIf="currentUser?.role === 'ADMIN' && branches.length > 0"
-        class="branch-selector flex align-items-center gap-2">
-        <span class="text-xs md:text-sm font-semibold text-white-alpha-70 hidden sm:inline">Sucursal:</span>
-        <p-dropdown [options]="branches" [(ngModel)]="selectedBranchId" (onChange)="onBranchChange()" optionLabel="name"
-          optionValue="id" placeholder="Todas las Sucursales" [showClear]="true"
-          [style]="{'min-width': '150px', 'max-width': '220px'}" styleClass="header-dropdown">
-          <ng-template pTemplate="selectedItem">
-            <div class="flex align-items-center gap-2" *ngIf="selectedBranchId">
-              <i class="pi pi-building text-primary"></i>
-              <span>{{selectedBranchName}}</span>
-            </div>
-            <span *ngIf="!selectedBranchId">Todas las Sucursales</span>
-          </ng-template>
-          <ng-template let-branch pTemplate="item">
-            <div class="flex align-items-center gap-2">
-              <i class="pi pi-building text-primary"></i>
-              <span>{{branch.name}}</span>
-            </div>
-          </ng-template>
-        </p-dropdown>
+    <div class="user-profile-wrapper flex align-items-center gap-3 py-1 px-3 border-round-xl" *ngIf="currentUser">
+      <!-- Info de Usuario (Nombre y Rol) -->
+      <div class="user-info-group flex flex-column align-items-end">
+        <span class="username-text font-bold text-white text-sm md:text-base">
+          <i class="pi pi-user mr-1 text-primary"></i>{{currentUser.username}}
+        </span>
+        <span class="role-badge text-xs font-semibold uppercase px-2 py-0 border-round">{{currentUser.role}}</span>
       </div>
 
-      <!-- Info de Usuario -->
-      <div *ngIf="currentUser" class="user-display flex align-items-center gap-2">
-        <div class="flex flex-column align-items-end line-height-2">
-          <span class="font-bold text-white text-sm md:text-base">
-            <i class="pi pi-user mr-1 text-primary"></i>{{currentUser.username}}
-          </span>
-          <span class="text-xs text-white-alpha-60 font-medium uppercase">{{currentUser.role}}</span>
+      <p-divider layout="vertical" class="hidden md:block surface-border opacity-20"></p-divider>
+
+      <!-- Selección de Sucursal / Sucursal Asignada -->
+      <div class="branch-info-group flex align-items-center">
+        <!-- Selector para ADMIN -->
+        <div *ngIf="currentUser.role === 'ADMIN' && branches.length > 0" class="flex align-items-center gap-2">
+          <p-dropdown [options]="branches" [(ngModel)]="selectedBranchId" (onChange)="onBranchChange()"
+            optionLabel="name" optionValue="id" placeholder="Sucursales" [showClear]="true"
+            styleClass="header-dropdown compact-dropdown">
+            <ng-template pTemplate="selectedItem">
+              <div class="flex align-items-center gap-2 text-sm" *ngIf="selectedBranchId">
+                <i class="pi pi-building text-primary"></i>
+                <span class="font-medium">{{selectedBranchName}}</span>
+              </div>
+              <span *ngIf="!selectedBranchId" class="text-sm opacity-60">Global</span>
+            </ng-template>
+          </p-dropdown>
         </div>
 
-        <div *ngIf="currentUser.branchName" class="hidden md:block">
-          <span class="product-badge status-instock text-xs py-1 px-2 border-round">
-            <i class="pi pi-building mr-1"></i>{{currentUser.branchName}}
-          </span>
+        <!-- Solo display para otros roles -->
+        <div *ngIf="currentUser.role !== 'ADMIN' && currentUser.branchName"
+          class="flex align-items-center gap-2 px-2 py-1 surface-100-alpha-10 border-round">
+          <i class="pi pi-building text-primary"></i>
+          <span class="text-sm font-medium text-white">{{currentUser.branchName}}</span>
         </div>
       </div>
     </div>

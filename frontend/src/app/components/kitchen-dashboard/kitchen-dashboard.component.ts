@@ -153,4 +153,16 @@ export class KitchenDashboardComponent implements OnInit, OnDestroy {
     const diff = Math.floor((now - start) / 60000); // minutes
     return `${diff} min`;
   }
+
+  getTimerClass(date: any): string {
+    if (!date) return 'bg-orange-100 text-orange-700';
+    const start = new Date(date).getTime();
+    const now = new Date().getTime();
+    const diffMin = Math.floor((now - start) / 60000);
+
+    if (diffMin > 15) return 'bg-red-600 text-white';
+    if (diffMin > 10) return 'bg-orange-600 text-white';
+    if (diffMin > 5) return 'bg-yellow-500 text-black';
+    return 'bg-orange-100 text-orange-700';
+  }
 }
