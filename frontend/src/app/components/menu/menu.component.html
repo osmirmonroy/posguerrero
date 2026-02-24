@@ -279,4 +279,28 @@
     </ng-template>
 </p-dialog>
 
+<!-- Toast for Printing Confirmation -->
+<p-toast position="top-center" key="print-toast">
+    <ng-template let-message pTemplate="message">
+        <div class="flex flex-column" style="flex: 1">
+            <div class="text-center">
+                <i class="pi pi-check-circle text-success" style="font-size: 3rem"></i>
+                <h4 class="m-0 mt-3 font-bold">{{message.summary}}</h4>
+                <p class="text-700">{{message.detail}}</p>
+            </div>
+            <div class="grid p-fluid mt-3 gap-2 px-2">
+                <div class="col">
+                    <button type="button" pButton
+                        (click)="printTicket(message.data); messageService.clear('print-toast')" icon="pi pi-print"
+                        label="Imprimir" class="p-button-success border-round-xl py-3"></button>
+                </div>
+                <div class="col">
+                    <button type="button" pButton (click)="messageService.clear('print-toast')" label="Cerrar"
+                        class="p-button-secondary p-button-text border-round-xl py-3"></button>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-toast>
+
 <p-toast position="top-center"></p-toast>

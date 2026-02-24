@@ -4,6 +4,9 @@ import { BranchService } from '../../services/branch.service';
 import { Order } from '../../models/taqueria.models';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { BluetoothPrintService } from '../../services/bluetooth-print.service';
+import { EscPosEncoder } from '../../utils/esc-pos-encoder';
+import { OrderItem } from '../../models/taqueria.models';
 
 @Component({
   selector: 'app-order-list',
@@ -23,7 +26,8 @@ export class OrderListComponent implements OnInit {
     private taqueriaService: TaqueriaService,
     private branchService: BranchService,
     private router: Router,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private printService: BluetoothPrintService
   ) { }
 
   ngOnInit(): void {
@@ -74,5 +78,64 @@ export class OrderListComponent implements OnInit {
         }
       });
     }
+  }
+
+  getItemTotal(item: OrderItem): number {
+    let price = item.product.price;
+    if (item.extras) {
+      price += item.extras.reduce((sum, e) => sum + e.price, 0);
+    }
+    return price * item.quantity;
+  }
+
+  async printTicket(order: Order) {
+    const encoder = new EscPosEncoder();
+
+    encoder
+      .align('center')
+      .size(true, true)
+      .line('Tacos el Guerrero')
+      .size(false, false)
+      .line('Ricos Tacos Estilo Mexico')
+      .line('--------------------------------')
+      .align('left')
+      .line(`Ticket #: ${order.id || 'N/A'}`)
+      .line(`Fecha: ${new Date(order.date || Date.now()).toLocaleString()}`)
+      .line(`Cliente: ${order.customerName || 'General'}`)
+      .line('--------------------------------')
+      .bold(true)
+      .line('Item              Cant.  Total')
+      .bold(false);
+
+    order.items.forEach(item => {
+      const name = item.product.name.substring(0, 16).padEnd(16);
+      const qty = item.quantity.toString().padStart(5);
+      const total = this.getItemTotal(item).toFixed(2).padStart(7);
+      encoder.line(`${name} ${qty} ${total}`);
+
+      if (item.extras && item.extras.length > 0) {
+        item.extras.forEach(extra => {
+          encoder.line(` + ${extra.name}`);
+        });
+      }
+    });
+
+    const grandTotal = order.items.reduce((sum, item) => sum + this.getItemTotal(item), 0);
+
+    encoder
+      .line('--------------------------------')
+      .align('right')
+      .bold(true)
+      .size(false, true)
+      .line(`TOTAL: $${grandTotal.toFixed(2)}`)
+      .size(false, false)
+      .line(' ')
+      .align('center')
+      .line('¡Gracias por su preferencia!')
+      .line(' ')
+      .line(' ')
+      .cut();
+
+    await this.printService.print(encoder.encode());
   }
 }

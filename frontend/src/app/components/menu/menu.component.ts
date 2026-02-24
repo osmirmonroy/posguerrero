@@ -4,6 +4,8 @@ import { TaqueriaService } from '../../services/taqueria.service';
 import { BranchService } from '../../services/branch.service';
 import { MessageService } from 'primeng/api';
 import { ActivatedRoute } from '@angular/router';
+import { BluetoothPrintService } from '../../services/bluetooth-print.service';
+import { EscPosEncoder } from '../../utils/esc-pos-encoder';
 
 @Component({
   selector: 'app-menu',
@@ -29,8 +31,9 @@ export class MenuComponent implements OnInit {
   constructor(
     private taqueriaService: TaqueriaService,
     private branchService: BranchService,
-    private messageService: MessageService,
-    private route: ActivatedRoute
+    public messageService: MessageService,
+    private route: ActivatedRoute,
+    private printService: BluetoothPrintService
   ) { }
 
   ngOnInit(): void {
@@ -180,7 +183,14 @@ export class MenuComponent implements OnInit {
           this.currentOrder = newOrder;
           this.orderItems = newOrder.items;
           this.customerName = newOrder.customerName || '';
-          this.messageService.add({ severity: 'success', summary: 'Pedido Creado', detail: 'Pedido creado exitosamente' });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Pedido Creado',
+            detail: 'Pedido creado exitosamente. ¿Desea imprimir el ticket?',
+            sticky: true,
+            id: 'print-toast',
+            data: newOrder
+          });
         },
         error: () => {
           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo crear el pedido' });
@@ -251,6 +261,57 @@ export class MenuComponent implements OnInit {
 
   canSendOrder(): boolean {
     return this.orderItems.length > 0;
+  }
+
+  async printTicket(order: Order) {
+    const encoder = new EscPosEncoder();
+
+    encoder
+      .align('center')
+      .size(true, true)
+      .line('Tacos el Guerrero')
+      .size(false, false)
+      .line('Ricos Tacos Estilo Mexico')
+      .line('--------------------------------')
+      .align('left')
+      .line(`Ticket #: ${order.id || 'N/A'}`)
+      .line(`Fecha: ${new Date().toLocaleString()}`)
+      .line(`Cliente: ${order.customerName || 'General'}`)
+      .line('--------------------------------')
+      .bold(true)
+      .line('Item              Cant.  Total')
+      .bold(false);
+
+    order.items.forEach(item => {
+      const name = item.product.name.substring(0, 16).padEnd(16);
+      const qty = item.quantity.toString().padStart(5);
+      const total = this.getItemTotal(item).toFixed(2).padStart(7);
+      encoder.line(`${name} ${qty} ${total}`);
+
+      if (item.extras && item.extras.length > 0) {
+        item.extras.forEach(extra => {
+          encoder.line(` + ${extra.name}`);
+        });
+      }
+    });
+
+    const grandTotal = order.items.reduce((sum, item) => sum + this.getItemTotal(item), 0);
+
+    encoder
+      .line('--------------------------------')
+      .align('right')
+      .bold(true)
+      .size(false, true)
+      .line(`TOTAL: $${grandTotal.toFixed(2)}`)
+      .size(false, false)
+      .line(' ')
+      .align('center')
+      .line('¡Gracias por su preferencia!')
+      .line(' ')
+      .line(' ')
+      .cut();
+
+    await this.printService.print(encoder.encode());
   }
 
   clearOrder() {

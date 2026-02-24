@@ -38,6 +38,9 @@
                     <div class="flex justify-content-center gap-2">
                         <button pButton icon="pi pi-search" pTooltip="Ver Detalles" tooltipPosition="top"
                             (click)="showDetails(order)" class="p-button-rounded p-button-text p-button-info"></button>
+                        <button pButton icon="pi pi-print" pTooltip="Imprimir Ticket" tooltipPosition="top"
+                            (click)="printTicket(order)"
+                            class="p-button-rounded p-button-text p-button-success"></button>
                         <button pButton icon="pi pi-trash" pTooltip="Borrar Pedido" tooltipPosition="top"
                             (click)="confirmDelete(order)"
                             class="p-button-rounded p-button-text p-button-danger"></button>
@@ -112,6 +115,8 @@
         </div>
     </div>
     <ng-template pTemplate="footer">
+        <p-button *ngIf="selectedOrder" icon="pi pi-print" (click)="printTicket(selectedOrder)" label="Imprimir"
+            styleClass="p-button-success mr-2"></p-button>
         <p-button *ngIf="selectedOrder && (selectedOrder.status === 'OPEN' || selectedOrder.status === 'REOPENED')"
             icon="pi pi-pencil" (click)="editOrder(selectedOrder)" label="Editar Pedido"
             styleClass="p-button-warning mr-2"></p-button>
