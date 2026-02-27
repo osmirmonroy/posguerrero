@@ -7,11 +7,19 @@
             <button pButton pRipple label="Nueva Categoría" icon="pi pi-plus" class="p-button-success mr-2"
                 (click)="openNew()"></button>
         </ng-template>
+        <ng-template pTemplate="right">
+            <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="dtCat.filterGlobal($any($event.target).value, 'contains')"
+                    placeholder="Búsqueda global..." />
+            </span>
+        </ng-template>
     </p-toolbar>
 
-    <p-table [value]="categories" [rows]="10" [paginator]="true" [tableStyle]="{'min-width': '50rem'}" [rowHover]="true"
-        dataKey="id" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} categorías"
-        [showCurrentPageReport]="true">
+    <p-table #dtCat [value]="categories" [rows]="10" [paginator]="true" [tableStyle]="{'min-width': '50rem'}"
+        [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} categorías"
+        [showCurrentPageReport]="true" [globalFilterFields]="['name', 'description']">
         <ng-template pTemplate="caption">
             <div class="flex align-items-center justify-content-between">
                 <h5 class="m-0">Administrar Categorías</h5>
@@ -19,9 +27,11 @@
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="name" style="min-width:15rem">Nombre <p-sortIcon field="name"></p-sortIcon></th>
-                <th pSortableColumn="description">Descripción <p-sortIcon field="description"></p-sortIcon></th>
-                <th></th>
+                <th pSortableColumn="name" style="min-width:15rem">Nombre <p-sortIcon field="name"></p-sortIcon>
+                    <p-columnFilter type="text" field="name" display="menu"></p-columnFilter></th>
+                <th pSortableColumn="description">Descripción <p-sortIcon field="description"></p-sortIcon>
+                    <p-columnFilter type="text" field="description" display="menu"></p-columnFilter></th>
+                <th style="min-width:8rem"></th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-cat>

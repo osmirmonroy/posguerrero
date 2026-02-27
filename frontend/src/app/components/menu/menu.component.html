@@ -19,13 +19,33 @@
                 </div>
             </div>
 
-            <!-- Category Fast Filter -->
-            <div class="flex gap-2 mb-4 overflow-x-auto pb-2 category-scroll-container">
+            <!-- Category Fast Filter (Desktop) -->
+            <div class="hidden md:flex gap-2 mb-4 overflow-x-auto pb-2 category-scroll-container">
                 <button pButton *ngFor="let cat of categories" icon="pi pi-tag" [label]="cat"
                     (click)="filterByCategory(cat)"
                     [class]="selectedCategory === cat ? 'p-button-raised' : 'p-button-outlined p-button-secondary'"
                     class="p-button-sm white-space-nowrap border-round-xl px-4 py-2 transition-all duration-200">
                 </button>
+            </div>
+
+            <!-- Category Fast Filter (Mobile Dropdown) -->
+            <div class="md:hidden w-full mb-4">
+                <p-dropdown [options]="categories" [(ngModel)]="selectedCategory"
+                    (onChange)="filterByCategory($event.value)" placeholder="Seleccionar Categoría"
+                    styleClass="w-full border-round-xl py-1">
+                    <ng-template let-category pTemplate="selectedItem">
+                        <div class="flex align-items-center gap-2">
+                            <i class="pi pi-tag text-primary"></i>
+                            <span class="font-bold">{{category}}</span>
+                        </div>
+                    </ng-template>
+                    <ng-template let-category pTemplate="item">
+                        <div class="flex align-items-center gap-2">
+                            <i class="pi pi-tag text-600"></i>
+                            <span>{{category}}</span>
+                        </div>
+                    </ng-template>
+                </p-dropdown>
             </div>
 
             <!-- Products Segmented by Category -->
@@ -283,12 +303,22 @@
                 <p class="text-700">{{message.detail}}</p>
             </div>
             <div class="grid p-fluid mt-3 gap-2 px-2">
-                <div class="col">
+                <div class="col-12 mt-2 font-medium text-600">Conectar Impresora:</div>
+                <div class="col-6">
                     <button type="button" pButton
-                        (click)="printTicket(message.data); messageService.clear('print-toast')" icon="pi pi-print"
-                        label="Imprimir" class="p-button-success border-round-xl py-3"></button>
+                        (click)="connectAndPrint(message.data, 'bluetooth'); messageService.clear('print-toast')"
+                        icon="pi pi-bluetooth" label="Bluetooth"
+                        class="p-button-primary border-round-xl py-2 w-full"></button>
                 </div>
-                <div class="col">
+                <div class="col-6">
+                    <button type="button" pButton
+                        (click)="connectAndPrint(message.data, 'usb'); messageService.clear('print-toast')"
+                        icon="pi pi-usb" label="USB / COM"
+                        class="p-button-primary border-round-xl py-2 w-full"></button>
+                </div>
+            </div>
+            <div class="grid p-fluid mt-2 gap-2 px-2">
+                <div class="col-12">
                     <button type="button" pButton (click)="messageService.clear('print-toast')" label="Cerrar"
                         class="p-button-secondary p-button-text border-round-xl py-3"></button>
                 </div>

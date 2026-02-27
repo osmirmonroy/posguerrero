@@ -1,17 +1,28 @@
 <div class="user-list-container fade-in">
     <div class="card">
-        <div class="flex justify-content-between align-items-center mb-4">
+        <div class="flex flex-column md:flex-row justify-content-between align-items-center mb-4 gap-3">
             <h2>Gestión de Usuarios</h2>
-            <p-button label="Nuevo Usuario" icon="pi pi-plus" routerLink="/users/new"></p-button>
+            <div class="flex gap-2">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dtUser.filterGlobal($any($event.target).value, 'contains')"
+                        placeholder="Búsqueda global..." />
+                </span>
+                <p-button label="Nuevo Usuario" icon="pi pi-plus" routerLink="/users/new"></p-button>
+            </div>
         </div>
 
-        <p-table [value]="users" [tableStyle]="{ 'min-width': '50rem' }" [rows]="10" [paginator]="true">
+        <p-table #dtUser [value]="users" [tableStyle]="{ 'min-width': '50rem' }" [rows]="10" [paginator]="true"
+            [globalFilterFields]="['username', 'role', 'branchName']">
             <ng-template pTemplate="header">
                 <tr>
                     <th>ID</th>
-                    <th>Usuario</th>
-                    <th>Rol</th>
-                    <th>Sucursal</th>
+                    <th pSortableColumn="username">Usuario <p-sortIcon field="username"></p-sortIcon> <p-columnFilter
+                            type="text" field="username" display="menu"></p-columnFilter></th>
+                    <th pSortableColumn="role">Rol <p-sortIcon field="role"></p-sortIcon> <p-columnFilter type="text"
+                            field="role" display="menu"></p-columnFilter></th>
+                    <th pSortableColumn="branchName">Sucursal <p-sortIcon field="branchName"></p-sortIcon>
+                        <p-columnFilter type="text" field="branchName" display="menu"></p-columnFilter></th>
                     <th>Acciones</th>
                 </tr>
             </ng-template>

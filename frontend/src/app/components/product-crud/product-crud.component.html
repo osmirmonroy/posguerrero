@@ -6,21 +6,31 @@
             <h5 class="m-0 text-xl font-bold text-700">Gestión de Productos</h5>
         </ng-template>
         <ng-template pTemplate="right">
+            <span class="p-input-icon-left mr-2">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                    placeholder="Búsqueda global..." />
+            </span>
             <button pButton pRipple label="Añadir Producto" icon="pi pi-plus" class="p-button-success border-round-lg"
                 (click)="openNew()"></button>
         </ng-template>
     </p-toolbar>
 
-    <p-table [value]="products" [rows]="10" [paginator]="true" [rowHover]="true" dataKey="id" responsiveLayout="stack"
-        breakpoint="960px" styleClass="p-datatable-responsive-stack"
+    <p-table #dt [value]="products" [rows]="10" [paginator]="true" [rowHover]="true" dataKey="id"
+        responsiveLayout="stack" breakpoint="960px" styleClass="p-datatable-responsive-stack"
+        [globalFilterFields]="['name', 'category', 'description']"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" [showCurrentPageReport]="true">
 
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon></th>
-                <th pSortableColumn="price">Precio <p-sortIcon field="price"></p-sortIcon></th>
-                <th pSortableColumn="category">Categoría <p-sortIcon field="category"></p-sortIcon></th>
-                <th pSortableColumn="description">Descripción <p-sortIcon field="description"></p-sortIcon></th>
+                <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon> <p-columnFilter type="text"
+                        field="name" display="menu"></p-columnFilter></th>
+                <th pSortableColumn="price">Precio <p-sortIcon field="price"></p-sortIcon> <p-columnFilter
+                        type="numeric" field="price" display="menu" currency="MXN"></p-columnFilter></th>
+                <th pSortableColumn="category">Categoría <p-sortIcon field="category"></p-sortIcon> <p-columnFilter
+                        type="text" field="category" display="menu"></p-columnFilter></th>
+                <th pSortableColumn="description">Descripción <p-sortIcon field="description"></p-sortIcon>
+                    <p-columnFilter type="text" field="description" display="menu"></p-columnFilter></th>
                 <th class="text-center">Acciones</th>
             </tr>
         </ng-template>

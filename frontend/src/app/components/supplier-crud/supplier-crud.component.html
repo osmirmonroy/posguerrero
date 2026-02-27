@@ -6,15 +6,25 @@
             <button pButton pRipple label="Volver al Inventario" icon="pi pi-arrow-left" class="p-button-secondary"
                 [routerLink]="['/inventory/supplies']"></button>
         </ng-template>
+        <ng-template pTemplate="right">
+            <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="dtSup.filterGlobal($any($event.target).value, 'contains')"
+                    placeholder="Búsqueda global..." />
+            </span>
+        </ng-template>
     </p-toolbar>
 
-    <p-table [value]="suppliers" [rows]="10" [paginator]="true" responsiveLayout="scroll">
+    <p-table #dtSup [value]="suppliers" [rows]="10" [paginator]="true" responsiveLayout="scroll"
+        [globalFilterFields]="['name', 'contactName', 'email']">
         <ng-template pTemplate="header">
             <tr>
-                <th>Nombre</th>
-                <th>Contacto</th>
-                <th>Teléfono</th>
-                <th>Email</th>
+                <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon> <p-columnFilter type="text"
+                        field="name" display="menu"></p-columnFilter></th>
+                <th pSortableColumn="contactName">Contacto <p-sortIcon field="contactName"></p-sortIcon> <p-columnFilter
+                        type="text" field="contactName" display="menu"></p-columnFilter></th>
+                <th pSortableColumn="phoneNumber">Teléfono <p-sortIcon field="phoneNumber"></p-sortIcon></th>
+                <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
                 <th>Acciones</th>
             </tr>
         </ng-template>

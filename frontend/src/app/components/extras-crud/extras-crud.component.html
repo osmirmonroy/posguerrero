@@ -6,11 +6,18 @@
             <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success mr-2"
                 (click)="openNew()"></button>
         </ng-template>
+        <ng-template pTemplate="right">
+            <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="dtExt.filterGlobal($any($event.target).value, 'contains')"
+                    placeholder="Búsqueda global..." />
+            </span>
+        </ng-template>
     </p-toolbar>
 
-    <p-table [value]="extras" [rows]="10" [paginator]="true" [tableStyle]="{'min-width': '75rem'}" [rowHover]="true"
-        dataKey="id" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
-        [showCurrentPageReport]="true">
+    <p-table #dtExt [value]="extras" [rows]="10" [paginator]="true" [tableStyle]="{'min-width': '75rem'}"
+        [rowHover]="true" dataKey="id" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
+        [showCurrentPageReport]="true" [globalFilterFields]="['name', 'price']">
         <ng-template pTemplate="caption">
             <div class="flex align-items-center justify-content-between">
                 <h5 class="m-0">Gestionar Extras</h5>
@@ -18,8 +25,10 @@
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="name" style="min-width:15rem">Nombre <p-sortIcon field="name"></p-sortIcon></th>
-                <th pSortableColumn="price">Precio <p-sortIcon field="price"></p-sortIcon></th>
+                <th pSortableColumn="name" style="min-width:15rem">Nombre <p-sortIcon field="name"></p-sortIcon>
+                    <p-columnFilter type="text" field="name" display="menu"></p-columnFilter></th>
+                <th pSortableColumn="price">Precio <p-sortIcon field="price"></p-sortIcon> <p-columnFilter
+                        type="numeric" field="price" display="menu" currency="MXN"></p-columnFilter></th>
                 <th></th>
             </tr>
         </ng-template>

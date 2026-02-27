@@ -4,14 +4,25 @@
             <button pButton pRipple label="Nueva Sucursal" icon="pi pi-plus" class="p-button-success mr-2"
                 (click)="openNew()"></button>
         </ng-template>
+        <ng-template pTemplate="right">
+            <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="dtBran.filterGlobal($any($event.target).value, 'contains')"
+                    placeholder="Búsqueda global..." />
+            </span>
+        </ng-template>
     </p-toolbar>
 
-    <p-table [value]="branches" [rows]="10" [paginator]="true" responsiveLayout="scroll">
+    <p-table #dtBran [value]="branches" [rows]="10" [paginator]="true" responsiveLayout="scroll"
+        [globalFilterFields]="['name', 'location', 'phone']">
         <ng-template pTemplate="header">
             <tr>
-                <th>Nombre</th>
-                <th>Ubicación</th>
-                <th>Teléfono</th>
+                <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon> <p-columnFilter type="text"
+                        field="name" display="menu"></p-columnFilter></th>
+                <th pSortableColumn="location">Ubicación <p-sortIcon field="location"></p-sortIcon> <p-columnFilter
+                        type="text" field="location" display="menu"></p-columnFilter></th>
+                <th pSortableColumn="phone">Teléfono <p-sortIcon field="phone"></p-sortIcon> <p-columnFilter type="text"
+                        field="phone" display="menu"></p-columnFilter></th>
                 <th>Estado</th>
                 <th>Acciones</th>
             </tr>

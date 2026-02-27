@@ -12,7 +12,9 @@ export class EscPosEncoder {
     }
 
     text(content: string): EscPosEncoder {
-        const bytes = this.encoder.encode(content);
+        // Sanitize string to remove accents and replace special characters with standard ASCII
+        const sanitizedContent = content.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const bytes = this.encoder.encode(sanitizedContent);
         bytes.forEach(b => this.buffer.push(b));
         return this;
     }

@@ -4,8 +4,7 @@ import { TaqueriaService } from '../../services/taqueria.service';
 import { BranchService } from '../../services/branch.service';
 import { MessageService } from 'primeng/api';
 import { ActivatedRoute } from '@angular/router';
-import { BluetoothPrintService } from '../../services/bluetooth-print.service';
-import { EscPosEncoder } from '../../utils/esc-pos-encoder';
+import { ThermalPrinterService } from '../../services/thermal-printer.service';
 
 @Component({
   selector: 'app-menu',
@@ -33,7 +32,7 @@ export class MenuComponent implements OnInit {
     private branchService: BranchService,
     public messageService: MessageService,
     private route: ActivatedRoute,
-    private printService: BluetoothPrintService
+    private printService: ThermalPrinterService
   ) { }
 
   ngOnInit(): void {
@@ -264,54 +263,21 @@ export class MenuComponent implements OnInit {
   }
 
   async printTicket(order: Order) {
-    const encoder = new EscPosEncoder();
+    // Legacy fallback handled by connectAndPrint below or inside the service if already connected.
+    await this.printService.printTicket(order);
+  }
 
-    encoder
-      .align('center')
-      .size(true, true)
-      .line('Tacos el Guerrero')
-      .size(false, false)
-      .line('Ricos Tacos Estilo Mexico')
-      .line('--------------------------------')
-      .align('left')
-      .line(`Ticket #: ${order.id || 'N/A'}`)
-      .line(`Fecha: ${new Date().toLocaleString()}`)
-      .line(`Cliente: ${order.customerName || 'General'}`)
-      .line('--------------------------------')
-      .bold(true)
-      .line('Item              Cant.  Total')
-      .bold(false);
-
-    order.items.forEach(item => {
-      const name = item.product.name.substring(0, 16).padEnd(16);
-      const qty = item.quantity.toString().padStart(5);
-      const total = this.getItemTotal(item).toFixed(2).padStart(7);
-      encoder.line(`${name} ${qty} ${total}`);
-
-      if (item.extras && item.extras.length > 0) {
-        item.extras.forEach(extra => {
-          encoder.line(` + ${extra.name}`);
-        });
+  async connectAndPrint(order: Order, connectionType: 'bluetooth' | 'usb') {
+    if (!this.printService.isConnected()) {
+      let connected = false;
+      if (connectionType === 'bluetooth') {
+        connected = await this.printService.connectBluetooth();
+      } else if (connectionType === 'usb') {
+        connected = await this.printService.connectUsb();
       }
-    });
-
-    const grandTotal = order.items.reduce((sum, item) => sum + this.getItemTotal(item), 0);
-
-    encoder
-      .line('--------------------------------')
-      .align('right')
-      .bold(true)
-      .size(false, true)
-      .line(`TOTAL: $${grandTotal.toFixed(2)}`)
-      .size(false, false)
-      .line(' ')
-      .align('center')
-      .line('¡Gracias por su preferencia!')
-      .line(' ')
-      .line(' ')
-      .cut();
-
-    await this.printService.print(encoder.encode());
+      if (!connected) return;
+    }
+    await this.printService.printTicket(order);
   }
 
   clearOrder() {

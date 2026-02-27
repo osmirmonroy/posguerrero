@@ -6,10 +6,18 @@
             <button pButton pRipple label="Gestionar Proveedores" icon="pi pi-users" class="p-button-help"
                 [routerLink]="['/admin/suppliers']"></button>
         </ng-template>
+        <ng-template pTemplate="right">
+            <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                    placeholder="Búsqueda global..." />
+            </span>
+        </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="supplies" [rows]="10" [paginator]="true" [globalFilterFields]="['name','category']"
-        [rowHover]="true" dataKey="id" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
+    <p-table #dt [value]="supplies" [rows]="10" [paginator]="true"
+        [globalFilterFields]="['name','stock','supplier.name']" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
         [showCurrentPageReport]="true">
         <ng-template pTemplate="caption">
             <div class="flex align-items-center justify-content-between">
@@ -18,11 +26,14 @@
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon> <p-columnFilter type="text"
+                        field="name" display="menu"></p-columnFilter></th>
                 <th>Unidad</th>
-                <th pSortableColumn="stock">Existencias <p-sortIcon field="stock"></p-sortIcon></th>
+                <th pSortableColumn="stock">Existencias <p-sortIcon field="stock"></p-sortIcon> <p-columnFilter
+                        type="numeric" field="stock" display="menu"></p-columnFilter></th>
                 <th>Stock Mín.</th>
-                <th>Proveedor</th>
+                <th pSortableColumn="supplier.name">Proveedor <p-sortIcon field="supplier.name"></p-sortIcon>
+                    <p-columnFilter type="text" field="supplier.name" display="menu"></p-columnFilter></th>
                 <th>Acciones</th>
             </tr>
         </ng-template>
